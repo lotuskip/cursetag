@@ -1,0 +1,69 @@
+INTRODUCTION
+
+This is a sort of a guide into using CurseTag. For installation instructions,
+see INSTALL file.
+
+CurseTag is a text-based audio file tag (metadata) editor. It aims to be a
+simplified, lightweight, non-graphical alternative for the quite popular tag
+editor called EasyTag.
+
+In what follows, it will be assumed that the reader is at least somewhat
+familiar with EasyTag. Taking a look at their homepage
+	http:/easytag.sourceforge.net
+should give some idea.
+
+
+
+LIMITATIONS
+
+First off, CurseTag is not "EasyTag in text mode". It has significantly less
+features, and this will not change much in the future.
+
+At the moment, CurseTag does not even have any editable configuration. Some
+kind of options will probably be added in the future. Please make suggestions.
+
+CurseTag does not try to be as smart as EasyTag. Some examples:
+(1) If a file has extension ".ogg", then its tag is assumed to be an ogg
+    vorbis tag, and if it is not, CurseTag will simply fail to process
+	that file.
+(2) All tags are written in UTF-8 only. Tags that are not UTF-8 might be read
+    wrong or not at all.
+(3) There is no support for deprecated versions of any of the audio formats.
+(4) If you have crazy filenames containing escape characters and what not,
+    don't be surprised if something goes wrong.
+
+Compared to EasyTag, CurseTag does much less with regards to reading the tags.
+If the file has non-standard tags or if its tags are in a weird encoding or
+something else is not-strictly-standard, CurseTag will most likely fail to read
+the tags in any usable way. The purpose of the program is to *write* the tags,
+and to write them to follow the specifications.
+
+Not all the tags are editable, either. Not all the possible tags, and not even
+all the tags editable in EasyTag. Embedded pictures are ignored alltogether.
+
+Finally, there might be some bugs. Users of EasyTag might hold on to that piece
+of software in case CurseTag screws up their metadata... Sorry in advance if
+that happens.
+
+Regarding additional features in the future:
+Mouse support does not sound necessary or even useful. Directory browser seems
+cumbersome and not too beneficial. So does the mere possibility of switching
+the directory without restarting the application. I'd rather keep it simple.
+
+If your desires and opinions differ from mine, feel free to fork or ignore.
+
+Formats and operations supported at the moment:
+Mpeg (mp3, mp2) metadata can be read and written.
+Ogg Vorbis and FLAC data is currently only viewable; modifications cannot be
+saved.
+Mp4, ape, mpc, and wavpack files are recognised, but there is no functionality.
+
+
+USAGE
+
+Please see the provided man page.
+
+
+LICENSE
+
+I don't care either way.

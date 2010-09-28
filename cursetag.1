@@ -1,0 +1,142 @@
+.TH cursetag
+.SH NAME
+CurseTag - NCurses based audio file tag editor
+.SH SYNOPSIS
+.B "cursetag" [DIRECTORY]
+.SH DESCRIPTION
+.PP
+[DIRECTORY] is the directory in which to work. CurseTag only deals with the files in one single directory, and does not touch
+subdirectories.
+.PP
+If no directory is given, the directory to use is read from stdin, so you can for instance write
+.I "pwd | cursetag"
+to use the current working directory.
+.PP
+If a valid directory was given, CurseTag will read the files in that directory and list those that are of a recognised audio file type
+(currently supported: ogg, flac, mpeg). If there are no recognised audio files in the directory, CurseTag exists.
+.SH USAGE
+.B "The following key commands are available initially:"
+.TP 16
+up-arrow, k
+move file selector up
+.TP
+down-arrow, j
+move file selector down
+.TP
+g, home
+jump to the beginning of the file list
+.TP
+G, end
+jump to the end of the file list
+.TP
+s
+select file (shows tag if already selected)
+.TP
+space
+toggle selection of a file
+.TP
+v
+invert current selection
+.TP
+V
+deselect all files
+.TP
+J
+select all files down from selector
+.TP
+K
+select all files up from selector
+.TP
+i
+enter edit mode (see below)
+.TP
+F
+fill tags according to file names (see below)
+.TP
+R
+rename files according to tags (see below)
+.TP
+W
+write all changes to files
+.TP
+q
+quit
+.TP
+?
+print version
+.PP
+To edit the tags manually, enter the edit mode by pressing 'i'. At least one file has to be
+selected.
+.PP
+.B "In edit mode, the following keys are recognised:"
+.TP 10
+up-arrow, k
+move to previous entry
+.TP
+down-arrow, j
+move to next entry
+.TP
+escape, !
+exit the edit mode
+.TP
+r
+replace the text in current entry
+.TP
+a
+append to current entry
+.TP
+i
+insert in the beginning of current entry
+.TP
+c
+clear the current entry
+.TP
+C
+clear all entries for current file
+.TP
+e
+copy the content of the current entry to the corresponding entries in all selected files
+.TP
+</>
+change view to previous/next file
+.PP
+.B "Tag/filename interaction"
+.PP
+It is also possible to read the tags automatically from the filenames, or rename the files according to the tags.
+This is accomplished with a control string containing some of the following wildcards:
+.TP 8
+%t
+track title
+.TP
+%A
+artist
+.TP
+%a
+album
+.TP
+%y
+year (date)
+.TP
+%n
+track number
+.TP
+%N
+total number of tracks (if missing, will be filled in automatically according to file count)
+.TP
+%d
+disc number
+.TP
+%c
+comment
+.PP
+Anything besides these wildcards is interpreted literally. For instance, if the current browsing directory is /home/user/music/Band/Albumname/ and the files are named "01. First Track.ogg" etc., the tags can be filled with the string "%A/%a/%n. %t".
+.SH FILES
+.PP
+$XGD_CONFIG_HOME/.cursetag.conf
+or
+$HOME/.config/.cursetag.conf
+contains the configuration (not implemented yet!). It should be commented to be self-explanatory.
+.SH BUGS
+Bug reports and suggestions can be sent to
+.I "onnir at iki dot fi"
+
