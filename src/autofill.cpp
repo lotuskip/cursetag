@@ -166,7 +166,11 @@ string get_wild_str(const bool fill)
 		wattrset(dialog, COLOR_PAIR(0));
 		box(dialog, 0, 0);
 		wmove(dialog, 1, 1);
-		waddstr(dialog, "Enter wildcard string (up/down to scroll examples)");
+		if(fill)
+			waddstr(dialog, "Fill;");
+		else
+			waddstr(dialog, "Rename;");
+		waddstr(dialog, " enter wildcard string (up/down to scroll examples)");
 		wrefresh(dialog);
 
 		s = string_editor(examples, dialog, 1, 2, true);
@@ -226,6 +230,8 @@ string get_wild_str(const bool fill)
 void rename_selected()
 {
 	string ws = get_wild_str(false);
+	if(ws.empty())
+		return; // cancelled
     vector<string> tokens;
     tokenise(ws, tokens);
 	string tmp;
@@ -250,6 +256,8 @@ void rename_selected()
 void fill_selected()
 {
 	string ws = get_wild_str(true);
+	if(ws.empty())
+		return; // cancelled
     vector<string> tokens;
     tokenise(ws, tokens);
 	for(vector<FilelistEntry>::iterator it = files.begin(); it != files.end(); ++it)

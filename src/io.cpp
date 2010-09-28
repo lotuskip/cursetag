@@ -309,7 +309,6 @@ string string_editor(const vector<string> strs, WINDOW *win, const int basex, co
 
 		if((k = get_wch(&key)) == KEY_CODE_YES)
 		{
-			
 			if(key == KEY_RESIZE)
 			{
 				if(update_reso())
