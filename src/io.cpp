@@ -276,7 +276,8 @@ void redraw_whole_fileinfo()
 }
 
 
-string string_editor(const vector<string> strs, WINDOW *win, const int basex, const int basey, const bool append)
+string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
+	const int basey, const bool append, const bool fixbox)
 {
 	// the index in the string *in symbols* (so s[n] makes no sense)
 	int n = 0;
@@ -302,6 +303,11 @@ string string_editor(const vector<string> strs, WINDOW *win, const int basex, co
 			wattrset(win, COLOR_PAIR(3)|A_UNDERLINE);
 			waddstr(win, s.c_str());
 			wclrtoeol(win);
+			if(fixbox) // clrtoeol makes an ugly hole into the box!
+			{
+				wattrset(win, COLOR_PAIR(0));
+				box(win, 0, 0);
+			}
 			redraw = false;
 		}
 		wmove(win, basey, basex + n);

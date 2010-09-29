@@ -173,7 +173,7 @@ string get_wild_str(const bool fill)
 		waddstr(dialog, " enter wildcard string (up/down to scroll examples)");
 		wrefresh(dialog);
 
-		s = string_editor(examples, dialog, 1, 2, true);
+		s = string_editor(examples, dialog, 1, 2, true, true);
 		if(s.empty()) // cancelled, most likely
 			break;
 		//else if entered something new, record it:
