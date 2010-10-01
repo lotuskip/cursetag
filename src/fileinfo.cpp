@@ -41,6 +41,12 @@ int get_file_size(const char *filename)
 
 const string fopen_error = "Error opening file ";
 
+bool error_ret_false(const string& msg)
+{
+	cerr << msg << endl;
+	return false;
+}
+
 // all codec-specific handling is local:
 
 #ifdef ENABLE_OGG
@@ -67,10 +73,7 @@ bool read_ogg_info(const char *filename, FileInfo *target, Tag *tags)
 #ifdef ENABLE_OGG
 	FILE *file;
 	if(!(file = fopen(filename, "rb")))
-	{
-		cerr << fopen_error << filename << endl;
-		return false;
-	}
+		return error_ret_false(fopen_error + filename);
 
     OggVorbis_File vf;
     vorbis_info *vi;
@@ -120,34 +123,7 @@ bool read_ogg_info(const char *filename, FileInfo *target, Tag *tags)
 bool write_ogg_info(const char *filename, Tag *tags)
 {
 #ifdef ENABLE_OGG
-#if 0
-	// TODO: luultavasti #include <ogg/ogg.h>, sekä ks. easytagistä vcedit.c ja kopioi tarvittavat;
-	// kääntäjä valittaa noista vcedit_ -alkuisista.
-	FILE *file;
-	if(!(file = fopen(filename, "rb")))
-		return false;
-
-    vcedit_state *state = vcedit_new_state();
-    vorbis_comment *vc;
-    if(!vcedit_open(state, file))
-    {
-		vc = vcedit_comments(state);
-		vorbis_comment_clear(vc);
-		vorbis_comment_init(vc);
-		for(int i = 0; i < MAX_EDITABLES; ++i)
-			write_ogg_tag(vc, e_Tag(i), tags->strs[i]);
-		vcedit_write(state, file);
-		fclose(file);
-		vcedit_clear(state);
-    }
-	else
-    {
-        fclose(file);
-		vcedit_clear(state);
-		// could handle the various error codes and give more precise info (TODO?)
-		return false;
-    }
-#endif
+	// TODO
 	return true;
 #else
 	return false; // not supported
@@ -165,10 +141,7 @@ bool read_flac_info(const char *filename, FileInfo *target, Tag *tags)
 #ifdef ENABLE_FLAC
 	FLAC::Metadata::StreamInfo si;
 	if(!FLAC::Metadata::get_streaminfo(filename, si))
-	{
-			cerr << "Failed to read FLAC streaminfo, file " << filename << endl;
-			return false;
-	}	
+		return error_ret_false(string("Failed to read FLAC streaminfo, file ") + filename);
 
 	// the info
 	double duration = si.get_length(); // in ms!
@@ -182,10 +155,7 @@ bool read_flac_info(const char *filename, FileInfo *target, Tag *tags)
 	// the tags
 	FLAC::Metadata::VorbisComment vc;
 	if(!FLAC::Metadata::get_tags(filename, vc))
-	{
-		cerr << "Error reading tags, file " << filename << endl;
-		return false;
-	}
+		return error_ret_false(string("Error reading tags, file ") + filename);
 	FLAC::Metadata::VorbisComment::Entry entry;
 	string name;
 	int j;
@@ -199,7 +169,6 @@ bool read_flac_info(const char *filename, FileInfo *target, Tag *tags)
 		if(j < MAX_EDITABLES && tags->strs[j].empty())
 			tags->strs[j] = entry.get_field_value();
 	}
-	
     return true;
 #else
 	return false; // not supported
@@ -209,8 +178,76 @@ bool read_flac_info(const char *filename, FileInfo *target, Tag *tags)
 bool write_flac_info(const char *filename, Tag *tags)
 {
 #ifdef ENABLE_FLAC
-	// TODO
-    return false;
+	FLAC::Metadata::Chain chain;
+	if(!chain.is_valid())
+		return error_ret_false("Could not allocate FLAC chain!");
+	if(!chain.read(filename))
+		return error_ret_false(string("Error opening FLAC file \"") + filename + "\" for writing!");
+	FLAC::Metadata::Iterator iter;
+	if(!iter.is_valid())
+		return error_ret_false("Could not allocate FLAC iterator!");
+	iter.init(chain);
+	bool no_vorbis_block = false;
+	// we are only interested in vorbis comments:
+	while(iter.get_block_type() != FLAC__METADATA_TYPE_VORBIS_COMMENT)
+	{
+		if(!iter.next()) // last block
+		{
+			no_vorbis_block = true;
+			break;
+		}
+	}
+	if(no_vorbis_block)
+	{
+		// TODO: the entire block needs to be added!
+	}
+	else // iter points to the vorbis comment; update
+	{
+		// To mark which tags are present in the file already:
+		bool present_tags[MAX_EDITABLES] = { false, false, false, false, false,
+			false, false, false };
+		// it is a vorbis comment block, so this is safe:
+		FLAC::Metadata::VorbisComment vc = **(iter.get_block());
+		if(!vc.is_valid())
+			return error_ret_false("Could not construct vorbis comment!");
+		FLAC::Metadata::VorbisComment::Entry entry;
+		string name;
+		int j;
+		unsigned int i;
+		// Update entries that are present:
+		for(i = 0; i < vc.get_num_comments(); ++i)
+		{
+			entry = vc.get_comment(i);
+			if(!entry.is_valid())
+				return error_ret_false("Could not extract vc entry!");
+			name = entry.get_field_name();
+			j = 0;
+			while(j < MAX_EDITABLES && name != flac_entry_name[j])
+				++j;
+			if(j < MAX_EDITABLES)
+			{
+				present_tags[j] = true;
+				if(!entry.set_field_value(tags->strs[j].c_str())
+					|| !vc.set_comment(j, entry))
+					return error_ret_false("Error modifying vc entry!");
+			}
+		}
+		// Add any missing entries:
+		for(i = 0; i < MAX_EDITABLES; ++i)
+		{
+			if(!present_tags[i] && !tags->strs[i].empty())
+			{
+				if(!entry.set_field_name(flac_entry_name[i].c_str())
+					|| !entry.set_field_value(tags->strs[i].c_str())
+					|| !vc.append_comment(entry))
+					return error_ret_false("Error adding vc entry!");
+			}
+		}
+	}
+	// Done adding/updating, write:
+	if(!chain.write())
+		return error_ret_false("Error writing FLAC chain!");
+    return true;
 #else
 	return false; // not supported
 #endif

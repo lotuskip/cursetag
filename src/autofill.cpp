@@ -155,7 +155,7 @@ string get_wild_str(const bool fill)
 		examples.push_back("%n. %A - %a - %t");
 	}
 
-	WINDOW *dialog = newwin(4, col-2, row/2-2, 1);
+	WINDOW *dialog = newwin(5, col-2, row/2-3, 1);
 
 	string s = "";
     vector<string> tokens;
@@ -171,6 +171,16 @@ string get_wild_str(const bool fill)
 		else
 			waddstr(dialog, "Rename;");
 		waddstr(dialog, " enter wildcard string (up/down to scroll examples)");
+		wmove(dialog, 3, 1);
+		for(k = 0; k < MAX_EDITABLES; ++k)
+		{
+			waddstr(dialog, tag_abbr[k].c_str());
+			wattrset(dialog, COLOR_PAIR(1));
+			waddch(dialog, '%');
+			waddch(dialog, wcard[k]);
+			wattrset(dialog, COLOR_PAIR(0));
+			waddch(dialog, ' ');
+		}
 		wrefresh(dialog);
 
 		s = string_editor(examples, dialog, 1, 2, true, true);
@@ -193,22 +203,20 @@ string get_wild_str(const bool fill)
 		{
 			Tag tags;
 			extract_tags_to(&tags, tokens, directory + last_selected->name);
-			for(int idx = 0; idx < MAX_EDITABLES; ++idx)
+			for(k= 0; k < MAX_EDITABLES; ++k)
 			{
-				if(!tags.strs[idx].empty())
+				if(!tags.strs[k].empty())
 				{
-					waddstr(dialog, tag_abbr[idx].c_str());
+					waddstr(dialog, tag_abbr[k].c_str());
 					wattrset(dialog, COLOR_PAIR(3));
-					waddstr(dialog, tags.strs[idx].c_str());
+					waddstr(dialog, tags.strs[k].c_str());
 					wattrset(dialog, COLOR_PAIR(0));
 					waddstr(dialog, " | ");
 				}
 			}
 		}
 		else
-		{
             waddstr(dialog, filename_for(last_selected, tokens).c_str());
-		}
 		wrefresh(dialog);
 
 		do k = getch();
