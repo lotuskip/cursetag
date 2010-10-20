@@ -1,0 +1,21 @@
+Basic
+	aclocal
+	automake --add-missing
+	autoconf
+	./configure
+	make
+	sudo make install
+should work. The usual configure options are there, too.
+
+Then, about the stuff that isn't quite standard:
+
+CurseTag currently handles only flac, ogg vorbis, and mpeg layers 2&3.
+In the future, ape (monkey's audio), aac (mp4), and mpc might be added;
+wma probably not, 'cause it's evil.
+
+For flac, you need libFLAC++; for ogg vorbis, libvorbisfile;
+and for mpeg, id3lib. *None of these is required*! The only
+required library is libncurses! Indeed, you can compile the
+program without support for any audio formats. Not much use,
+that, but it's doable.
+

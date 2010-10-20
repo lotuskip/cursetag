@@ -207,17 +207,18 @@ bool write_flac_info(const char *filename, Tag *tags)
 		bool present_tags[MAX_EDITABLES] = { false, false, false, false, false,
 			false, false, false };
 		// it is a vorbis comment block, so this is safe:
-		FLAC::Metadata::VorbisComment vc = **(iter.get_block());
-		if(!vc.is_valid())
+		FLAC::Metadata::VorbisComment* vc
+			= dynamic_cast<FLAC::Metadata::VorbisComment*>(iter.get_block());
+		if(!vc || !vc->is_valid())
 			return error_ret_false("Could not construct vorbis comment!");
 		FLAC::Metadata::VorbisComment::Entry entry;
 		string name;
 		int j;
 		unsigned int i;
 		// Update entries that are present:
-		for(i = 0; i < vc.get_num_comments(); ++i)
+		for(i = 0; i < vc->get_num_comments(); ++i)
 		{
-			entry = vc.get_comment(i);
+			entry = vc->get_comment(i);
 			if(!entry.is_valid())
 				return error_ret_false("Could not extract vc entry!");
 			name = entry.get_field_name();
@@ -228,7 +229,7 @@ bool write_flac_info(const char *filename, Tag *tags)
 			{
 				present_tags[j] = true;
 				if(!entry.set_field_value(tags->strs[j].c_str())
-					|| !vc.set_comment(j, entry))
+					|| !vc->set_comment(j, entry))
 					return error_ret_false("Error modifying vc entry!");
 			}
 		}
@@ -239,7 +240,7 @@ bool write_flac_info(const char *filename, Tag *tags)
 			{
 				if(!entry.set_field_name(flac_entry_name[i].c_str())
 					|| !entry.set_field_value(tags->strs[i].c_str())
-					|| !vc.append_comment(entry))
+					|| !vc->append_comment(entry))
 					return error_ret_false("Error adding vc entry!");
 			}
 		}
