@@ -4,16 +4,18 @@
 #include <vector>
 #include "fileinfo.h"
 
+namespace TagLib { class FileRef; }
+
 struct FilelistEntry
 {
 	std::string name; // this is the actual name of the file on the hd
+	std::string newname; // new name in case we want to rename the file
 	bool selected;
 	bool need_redraw;
-	FileInfo info;
-	Tag tags;
+	bool unsaved_changes;
+	TagLib::FileRef *fref;
 
-	FilelistEntry(const std::string n, const FileInfo fi, const Tag t)
-		: name(n), selected(false), need_redraw(true), info(fi), tags(t) {}
+	FilelistEntry() : selected(false), need_redraw(true) {}
 };
 
 extern std::string directory;

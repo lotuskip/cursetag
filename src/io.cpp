@@ -28,8 +28,7 @@ const string entry_name[MAX_EDITABLES] = {
 "\nAlbum: ",
 "\nCD: ",
 "\nYear: ",
-"\nTrack # ",
-"\nTotal tracks: ",
+"\nTrack: ",
 "\nComment: " };
 
 void redraw_statics()
