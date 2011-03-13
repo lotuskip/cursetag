@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 			init_curses();
 			for(vector<FilelistEntry>::const_iterator i = files.begin(); i != files.end(); ++i)
 			{
-				if(i->unsaved_changes)
+				if(i->tags.unsaved_changes)
 				{
 					stat_msg("NOTE: some file names were autofixed!");
 					break;

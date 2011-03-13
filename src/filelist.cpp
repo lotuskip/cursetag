@@ -5,15 +5,11 @@
 #include <dirent.h>
 #include <iostream>
 #include <cstdio>
-#include <taglib/fileref.h>
 
 using namespace std;
-using namespace TagLib;
 
 namespace
 {
-const string replace_with_dash = "/\\:|";
-const string replace_with_unders = "*?\"";
 
 void check_empty_selection()
 {
@@ -29,25 +25,7 @@ void check_empty_selection()
 	last_selected = files.end();
 }
 
-
-string fix_filename(const string &s)
-{
-	// TODO assuming it's UTF-8; perhaps should check and autoconvert if not?
-	string ns = s;
-	size_t i;
-	while((i = ns.find_first_of(replace_with_dash)) != string::npos)
-		ns[i] = '-';
-	while((i = ns.find_first_of(replace_with_unders)) != string::npos)
-		ns[i] = '_';
-	
-	while((i = ns.find('<')) != string::npos)
-		ns[i] = '(';
-	while((i = ns.find('>')) != string::npos)
-		ns[i] = ')';
-	return ns;
 }
-
-} // end local namespace
 
 bool operator<(const FilelistEntry &a, const FilelistEntry &b)
 {
@@ -88,17 +66,13 @@ bool get_directory(const char* name)
 		directory += '/';
 
     struct dirent *dirp;
+	FileInfo tmp_finfo;
+	MyTag tmp_tag;
 	while((dirp = readdir(dp)) != NULL)
 	{
-		FileListEntry tmp_entry;
-		tmp_entry.fref = new FileRef((directory+string(dirp->d_name)).c_str());
-		if(tmp_entry.fref && !tmp_entry.fref->isNull())
-		{
-			tmp_entry.name = dirp->d_name;
-			tmp_entry.newname = fix_filename(tmp_entry.name);
-			tmp_entry.unsaved_changes = (tmp_entry.name != tmp_entry.newname);
-			files.push_back(tmp_entry);
-		}
+		// attempt to read file info; if this fails, the file is of non-supported format, not an audio file or misnamed
+		if(read_info((directory+string(dirp->d_name)).c_str(), &tmp_finfo, &tmp_tag))
+				files.push_back(FilelistEntry(string(dirp->d_name), tmp_finfo, tmp_tag));
 	}
 	closedir(dp);
 	
@@ -260,9 +234,9 @@ string write_modifieds()
 	bool wrote_sumn = false;
 	for(vector<FilelistEntry>::iterator i = files.begin(); i != files.end(); ++i)
 	{
-		if(i->selected && i->unsaved_changes)
+		if(i->selected && i->tags.unsaved_changes)
 		{
-			if(!write_info((directory + i->name).c_str(), i->fref))
+			if(!write_info((directory + i->name).c_str(), &(i->tags)))
 				return "Error writing tag for file \'"  + i->name + "\'!";
 			// else tag was written
 			if(i->name != i->info.filename) // needs to be renamed
@@ -280,7 +254,7 @@ string write_modifieds()
 			// if here, all went ok
 			wrote_sumn = true;
 			i->need_redraw = true;
-			i->unsaved_changes = false;
+			i->tags.unsaved_changes = false;
 		}
 	}
 	if(wrote_sumn)

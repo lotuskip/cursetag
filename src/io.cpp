@@ -26,7 +26,6 @@ const string entry_name[MAX_EDITABLES] = {
 "Title:  ",
 "\nArtist: ",
 "\nAlbum: ",
-"\nCD: ",
 "\nYear: ",
 "\nTrack: ",
 "\nComment: " };
@@ -63,102 +62,102 @@ void print_INS(const bool ins)
 
 void init_curses()
 {
-		// basic stuff
-		initscr();
-		cbreak();
-		keypad(stdscr, TRUE);
-		nodelay(stdscr, FALSE); // we want a blocking getch()
-		noecho();
-		getmaxyx(stdscr, row, col);
-		check_reso();
+	// basic stuff
+	initscr();
+	cbreak();
+	keypad(stdscr, TRUE);
+	nodelay(stdscr, FALSE); // we want a blocking getch()
+	noecho();
+	getmaxyx(stdscr, row, col);
+	check_reso();
 
-		// create some windows
-		ls_win = newwin(row-1, col/2, 0, 0);
-		tag_win = newwin(row-1, col/2, 0, col/2);
-		stat_win = newwin(1, col, row-2, 0);
+	// create some windows
+	ls_win = newwin(row-1, col/2, 0, 0);
+	tag_win = newwin(row-1, col/2, 0, col/2);
+	stat_win = newwin(1, col, row-2, 0);
 
-		// colours stuff
-		if(has_colors())
-		{
-				start_color();
-				char ct[4] = { COLOR_WHITE, // hard-wired; can't be changed; used for static texts
-				COLOR_CYAN, // unselected file in file list
-				COLOR_BLUE, // selected file in filelist
-				COLOR_GREEN }; //modifiable field in file info
+	// colours stuff
+	if(has_colors())
+	{
+		start_color();
+		char ct[4] = { COLOR_WHITE, // hard-wired; can't be changed; used for static texts
+		COLOR_CYAN, // unselected file in file list
+		COLOR_BLUE, // selected file in filelist
+		COLOR_GREEN }; //modifiable field in file info
 
-				for(int i = 0; i < 4; i++)
-						init_pair(i, ct[i], COLOR_BLACK); // background
-		}
+		for(int i = 0; i < 4; i++)
+			init_pair(i, ct[i], COLOR_BLACK); // background
+	}
 
-		draw_rng_begin = files.begin();
-		if((signed int)files.size() <= row-4)
-				draw_rng_end = files.end();
-		else
-				draw_rng_end = draw_rng_begin + (row-4);
-		refresh();
-		redraw_statics();
-		redraw_filelist(true);
+	draw_rng_begin = files.begin();
+	if((signed int)files.size() <= row-4)
+		draw_rng_end = files.end();
+	else
+		draw_rng_end = draw_rng_begin + (row-4);
+	refresh();
+	redraw_statics();
+	redraw_filelist(true);
 }
 
 
 void deinit_curses()
 {
-		delwin(ls_win);
-		delwin(tag_win);
-		delwin(stat_win);
-		echo();
-		endwin();
+	delwin(ls_win);
+	delwin(tag_win);
+	delwin(stat_win);
+	echo();
+	endwin();
 }
 
 
 bool update_reso()
 {
-		int oldr = row, oldc = col;
-		refresh();
-		getmaxyx(stdscr, row, col);
+	int oldr = row, oldc = col;
+	refresh();
+	getmaxyx(stdscr, row, col);
 
-		if(oldr != row || oldc != col)
+	if(oldr != row || oldc != col)
+	{
+		check_reso(); // might throw!
+		delwin(ls_win);
+		delwin(tag_win);
+		delwin(stat_win);
+		ls_win = newwin(row-1, col/2, 0, 0);
+		tag_win = newwin(row-1, col/2, 0, col/2);
+		stat_win = newwin(1, col, row-1, 0);
+
+		if((signed int)files.size() > row-4) // all files do not fit on the list!
 		{
-			check_reso(); // might throw!
-			delwin(ls_win);
-			delwin(tag_win);
-			delwin(stat_win);
-			ls_win = newwin(row-1, col/2, 0, 0);
-			tag_win = newwin(row-1, col/2, 0, col/2);
-			stat_win = newwin(1, col, row-1, 0);
-
-			if((signed int)files.size() > row-4) // all files do not fit on the list!
+			// get optimal range to view so that selected entry is about in the middle:
+			draw_rng_begin = draw_rng_end = under_selector;
+			int num = 0;
+			while(num < row-4)
 			{
-				// get optimal range to view so that selected entry is about in the middle:
-				draw_rng_begin = draw_rng_end = under_selector;
-				int num = 0;
-				while(num < row-4)
+				if(draw_rng_begin != files.begin())
 				{
-						if(draw_rng_begin != files.begin())
-						{
-								--draw_rng_begin;
-								if(++num == row-4)
-										break;
-						}
-						if(draw_rng_end != files.end())
-						{
-								++draw_rng_end;
-								++num;
-						}
+					--draw_rng_begin;
+					if(++num == row-4)
+						break;
+				}
+				if(draw_rng_end != files.end())
+				{
+					++draw_rng_end;
+					++num;
 				}
 			}
-			else // all fit; might be that didn't fit previously!
-			{
-					draw_rng_begin = files.begin();
-					draw_rng_end = files.end();
-			}
-
-			// changes took place; redraw everything:
-			redraw_filelist(true);
-			redraw_whole_fileinfo();
-			return true;
 		}
-		return false;
+		else // all fit; might be that didn't fit previously!
+		{
+			draw_rng_begin = files.begin();
+			draw_rng_end = files.end();
+		}
+
+		// changes took place; redraw everything:
+		redraw_filelist(true);
+		redraw_whole_fileinfo();
+		return true;
+	}
+	return false;
 }
 
 
@@ -178,17 +177,17 @@ void redraw_filelist(const bool redraw_everything)
 	}
 	else
 	{
-			// check if need to modify range:
-			while(under_selector < draw_rng_begin)
-			{
-					--draw_rng_begin;
-					--draw_rng_end;
-			}
-			while(under_selector >= draw_rng_end)
-			{
-					++draw_rng_begin;
-					++draw_rng_end;
-			}
+		// check if need to modify range:
+		while(under_selector < draw_rng_begin)
+		{
+			--draw_rng_begin;
+			--draw_rng_end;
+		}
+		while(under_selector >= draw_rng_end)
+		{
+			++draw_rng_begin;
+			++draw_rng_end;
+		}
 	}
 	wmove(ls_win, 1, 0);
 	int attr, y;
@@ -231,27 +230,27 @@ void redraw_filelist(const bool redraw_everything)
 
 void redraw_fileinfo(const int idx)
 {
-		if(last_selected != files.end())
+	if(last_selected != files.end())
+	{
+		int attr = COLOR_PAIR(3);
+		if(edit_mode && idx == idx_to_edit)
+			attr |= A_STANDOUT;
+		wattrset(tag_win, attr);
+		// filename
+		if(idx == -1)
 		{
-			int attr = COLOR_PAIR(3);
-			if(edit_mode && idx == idx_to_edit)
-				attr |= A_STANDOUT;
-			wattrset(tag_win, attr);
-			// filename
-			if(idx == -1)
-			{
-				wmove(tag_win, 0, 6); // after "File: "
-				waddstr(tag_win, last_selected->info.filename.c_str());
-			}
-			else
-			{
-				wmove(tag_win, 3+idx, entry_name[idx].size()-1);
-				waddstr(tag_win, last_selected->tags.strs[idx].c_str());
-			}
-			wclrtoeol(tag_win);
-			wrefresh(tag_win);
+			wmove(tag_win, 0, 6); // after "File: "
+			waddstr(tag_win, last_selected->info.filename.c_str());
 		}
-		else redraw_statics();
+		else
+		{
+			wmove(tag_win, 3+idx, entry_name[idx].size()-1);
+			waddstr(tag_win, last_selected->tags.strs[idx].c_str());
+		}
+		wclrtoeol(tag_win);
+		wrefresh(tag_win);
+	}
+	else redraw_statics();
 }
 
 
@@ -262,8 +261,6 @@ void redraw_whole_fileinfo()
 	wmove(tag_win, 1, 0);
 	wattrset(tag_win, COLOR_PAIR(0));
 	wprintw(tag_win, "brate %d kb/s", last_selected->info.bitrate);
-	if(last_selected->info.variable_bitrate)
-		wprintw(tag_win, " (VBR)");
 	wprintw(tag_win, "\tsrate %d Hz", last_selected->info.samplerate);
 	wclrtoeol(tag_win);
 	wprintw(tag_win, "\nfsize %d kb\tlen %d:%02d", last_selected->info.size/1024,
@@ -324,13 +321,13 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			// else
 			if(key == KEY_BACKSPACE)
 			{
-					if(n > 0)
-					{
-						del(s, n-1);
-						redraw = true;
-						--n;
-						--N;
-					}
+				if(n > 0)
+				{
+					del(s, n-1);
+					redraw = true;
+					--n;
+					--N;
+				}
 			}
 			else if(key == KEY_DC) // delete key
 			{
@@ -462,7 +459,6 @@ void edit_tag(const int idx, const bool append, const bool clear)
 }
 
 
-
 void stat_msg(const char* s)
 {
 	wmove(stat_win, 0, 4);
@@ -470,3 +466,4 @@ void stat_msg(const char* s)
 	wclrtoeol(stat_win);
 	wrefresh(stat_win);
 }
+

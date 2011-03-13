@@ -12,6 +12,11 @@ familiar with EasyTag. Taking a look at their homepage
 	http:/easytag.sourceforge.net
 should give some idea.
 
+CurseTag supports in principle the file types that TagLib does, which are
+(according to TagLib's homepage; I have not tested all of these with CurseTag!):
+Ogg Vorbis, MP3 (both ID3v1 and ID3v2), FLAC (with both ID3 and Vorbis tags),
+MPC, Speex, WavPack, TrueAudio, WAV, AIFF, MP4, and ASF.
+
 
 LIMITATIONS
 
@@ -22,13 +27,12 @@ At the moment, CurseTag does not even have any editable configuration. Some
 kind of options will probably be added in the future. Please make suggestions.
 
 CurseTag does not try to be as smart as EasyTag. Some examples:
-(1) If a file has extension ".ogg", then its tag is assumed to be an Ogg
-    Vorbis tag, and if it is not, CurseTag will simply fail to process
-	that file.
+(1) If a file has a weird extension, e.g. a vorbis file has extension ".mp3",
+    you might run into some trouble.
 (2) All tags are written in UTF-8 only. Tags that are not UTF-8 might be read
     wrong or not at all.
-(3) There is no support for deprecated versions of any of the audio formats or
-    libraries.
+(3) All tag handling is done on the most generic level, so the fine details
+    of different file types are ignored.
 (4) If you have crazy filenames containing escape characters and what not,
     don't be surprised if something goes wrong.
 
@@ -51,18 +55,6 @@ cumbersome and not too beneficial. So does the mere possibility of switching
 the directory without restarting the application. I'd rather keep it simple.
 
 If your desires and opinions differ from mine, feel free to fork or ignore.
-
-Formats and operations supported at the moment:
-FORMAT     READ TAGS     WRITE TAGS
-mpeg       yes           yes
-FLAC       yes           yes (although there are minor issues)
-ogg        yes           no
-mp4/aac    no            no
-ape        no            no
-mpc        no            no
-wacpack    no            no
-For all the files the metadata of which can be read, the "rename according
-to tags" functionality is usable.
 
 
 USAGE

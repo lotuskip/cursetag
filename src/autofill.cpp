@@ -15,16 +15,14 @@ const char wcard[MAX_EDITABLES+1] = {
 	't', // T_TITLE
 	'A', // T_ARTIST
 	'a', // T_ALBUM
-	'd', // T_DISC_NUMBER
 	'y', // T_YEAR
 	'n', // T_TRACK
-	'N', // T_TRACK_TOTAL
 	'c', // T_COMMENT
 	'\0' // make this a valid C string
 };
 
 const string tag_abbr[MAX_EDITABLES] = { "Title: ", "Art.: ", "Alb.: ",
-	"Disc: ", "Year: ", "Tr#: ", "Tr.tot.: ", "Comm.: " };
+	"Year: ", "Tr#: ", "Comm.: " };
 
 void tokenise(string s, vector<string> &res)
 {
@@ -84,7 +82,7 @@ string filename_for(vector<FilelistEntry>::iterator i, vector<string> tokens)
 }
 
 
-void extract_tags_to(Tag *target, vector<string> tokens, string filepath)
+void extract_tags_to(MyTag *target, vector<string> tokens, string filepath)
 {
 	// The last token can include the extension or not:
 	size_t i = filepath.rfind('.');
@@ -201,7 +199,7 @@ string get_wild_str(const bool fill)
     	tokenise(s, tokens);
 		if(fill)
 		{
-			Tag tags;
+			MyTag tags;
 			extract_tags_to(&tags, tokens, directory + last_selected->name);
 			for(k= 0; k < MAX_EDITABLES; ++k)
 			{
