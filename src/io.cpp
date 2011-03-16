@@ -18,8 +18,8 @@ vector<FilelistEntry>::const_iterator draw_rng_begin, draw_rng_end;
 
 void check_reso() // throws!
 {
-		if(row < MIN_ROWS || col < MIN_COLS)
-				throw 1;
+	if(row < MIN_ROWS || col < MIN_COLS)
+		throw 1;
 }
 
 const string entry_name[MAX_EDITABLES] = {
@@ -29,6 +29,9 @@ const string entry_name[MAX_EDITABLES] = {
 "\nYear: ",
 "\nTrack: ",
 "\nComment: " };
+
+const char* ins_str[2] = { "   ", "INS" };
+
 
 void redraw_statics()
 {
@@ -50,14 +53,11 @@ void redraw_statics()
 void print_INS(const bool ins)
 {
 	wmove(stat_win, 0, 0);
-	if(ins)
-		waddstr(stat_win, "INS");
-	else
-		waddstr(stat_win, "   ");
+	waddstr(stat_win, ins_str[ins]);
 	wrefresh(stat_win);
 }
 
-}
+} // end local namespace
 
 
 void init_curses()
@@ -273,15 +273,21 @@ void redraw_whole_fileinfo()
 
 
 string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
-	const int basey, const bool append, const bool fixbox)
+	const int basey, const bool append, const int boxsize, const bool fixbox)
 {
-	// the index in the string *in symbols* (so s[n] makes no sense)
+	// the index in the string *in UTF-8 symbols* (so s[n] makes no sense)
 	int n = 0;
+	// The index at which we start to print onto screen:
+	int printb_pos = 0;
+
 	vector<string>::const_iterator si = strs.begin();
 	string s = *si;
 	int N = num_syms(s); // maximum index
 	if(append)
+	{
 		n = N;
+		printb_pos = max(0, N - boxsize + 1);
+	}
 
 	int k;
 	wint_t key;
@@ -297,7 +303,7 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			print_INS(insert);
 			wmove(win, basey, basex);
 			wattrset(win, COLOR_PAIR(3)|A_UNDERLINE);
-			waddstr(win, s.c_str());
+			waddstr(win, mb_substr(s, printb_pos, min(N - printb_pos, boxsize)));
 			wclrtoeol(win);
 			if(fixbox) // clrtoeol makes an ugly hole into the box!
 			{
@@ -306,7 +312,7 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			}
 			redraw = false;
 		}
-		wmove(win, basey, basex + n);
+		wmove(win, basey, basex + n - printb_pos);
 		wrefresh(win);
 
 		if((k = get_wch(&key)) == KEY_CODE_YES)
@@ -324,9 +330,10 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 				if(n > 0)
 				{
 					del(s, n-1);
-					redraw = true;
-					--n;
+					if(--n < printb_pos)
+						printb_pos = max(0, printb_pos - boxsize/2);
 					--N;
+					redraw = true;
 				}
 			}
 			else if(key == KEY_DC) // delete key
@@ -334,29 +341,45 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 				if(n < N)
 				{
 					del(s, n);
-					redraw = true;
 					--N;
+					redraw = true;
 				}
 			}
 	 		else if(key == KEY_LEFT)
 			{
 				if(n > 0)
-					--n;
+				{
+					if(--n < printb_pos)
+					{
+						printb_pos = max(0, printb_pos - boxsize/2);
+						redraw = true;
+					}
+				}
 			}
 			else if(key == KEY_RIGHT)
 			{
 				if(n < N)
-					++n;
+				{
+					if(++n >= printb_pos + boxsize)
+					{
+						++printb_pos;
+						redraw = true;
+					}
+				}
 			}
 			else if(key == KEY_HOME)
-				n = 0;
-			else if(key == KEY_END)
-				n = N;
-			else if(key == KEY_IC) // insert key
 			{
-				insert = !insert;
+				n = printb_pos = 0;
 				redraw = true;
 			}
+			else if(key == KEY_END)
+			{
+				n = N;
+				printb_pos = max(0, N - boxsize + 1);
+				redraw = true;
+			}
+			else if(key == KEY_IC) // insert key
+				print_INS((insert = !insert));
 			else if(key == KEY_UP)
 			{
 				if(si != strs.begin())
@@ -376,8 +399,8 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			
 			if(replace_with)
 			{
-				s = *si;
-				n = N = num_syms(s);
+				n = N = num_syms((s = *si));
+				printb_pos = max(0, N - boxsize + 1);
 				redraw = true;
 				replace_with = false;
 			}
@@ -396,6 +419,9 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			{
 				ins(s, key, n);
 				++N; // string got longer
+				++n;
+				if(n >= printb_pos + boxsize)
+					++printb_pos;
 			}
 			else // not insert mode; delete and then insert
 			{
@@ -404,9 +430,11 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 				else // typing at the end of the string
 					++N;
 				ins(s, key, n);
+				++n;
+				if(n >= printb_pos + boxsize)
+					++printb_pos;
 			}
 			redraw = true;
-			++n;
 		}
 		else //i == ERR (? perhaps resize event?)
 		{
@@ -429,18 +457,20 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 void edit_tag(const int idx, const bool append, const bool clear)
 {
 	// get coordinates where the entry begins and a pointer to the content
-	int basex, basey;
+	int basex, basey, boxsize;
 	string *s;
 	if(idx == -1)
 	{
 		basey = 0;
 		basex = 6;
+		boxsize = col/2 - 6; // 6 = len("File: ")
 		s = &(last_selected->info.filename);
 	}
 	else
 	{
 		basey = 3 + idx;
 		basex = entry_name[idx].size()-1;
+		boxsize = col/2 - basex;
 		s = &(last_selected->tags.strs[idx]);
 	}
 	string original = *s;
@@ -449,7 +479,7 @@ void edit_tag(const int idx, const bool append, const bool clear)
 
 	vector<string> strs(1); // an array of one element...
 	strs[0] = *s;
-	*s = string_editor(strs, tag_win, basex, basey, append);
+	*s = string_editor(strs, tag_win, basex, basey, append, boxsize);
 	redraw_fileinfo(idx);
 	if(idx != -1 && original != *s)
 	{

@@ -74,9 +74,9 @@ string filename_for(vector<FilelistEntry>::iterator i, vector<string> tokens)
 	// We only rename *files*, so anything before the last '/' is unacceptable:
 	if((idx = result.rfind('/')) != string::npos)
 		result.erase(0, idx+1);
-	// check if the extension is present; if not, add it:
-	if(filetype_by_ext(result) != i->info.ft)
-		result += default_ext_for_ft[i->info.ft];
+	// Keep existing extension:
+	if((idx = i->name.rfind('.')) != string::npos)
+		result += i->name.substr(idx);
 
 	return result;
 }
@@ -181,7 +181,7 @@ string get_wild_str(const bool fill)
 		}
 		wrefresh(dialog);
 
-		s = string_editor(examples, dialog, 1, 2, true, true);
+		s = string_editor(examples, dialog, 1, 2, true, col-4, true);
 		if(s.empty()) // cancelled, most likely
 			break;
 		//else if entered something new, record it:

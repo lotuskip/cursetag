@@ -48,43 +48,8 @@ void int_to_str(const int n, string &s)
 } // end local namespace
 
 
-e_FileType filetype_by_ext(const std::string fname)
-{
-	// get extension and make it lowercase:
-	size_t i = fname.rfind('.');
-	if(i == string::npos)
-		return MAX_FILE_TYPE; // not an audio file or badly named
-	string ext = fname.substr(i);
-	if(!ext.empty()) ext.erase(0,1); // remove '.'
-	std::transform(ext.begin(), ext.end(), ext.begin(), (int(*)(int))tolower);
-
-	// our algorithm is very brutal...
-	if(ext == "ogg" || ext == "ogm")
-		return OGG_FILE;
-	if(ext == "flac" || ext == "fla")
-		return FLAC_FILE;
-	if(ext == "mp4" || ext == "m4a" || ext == "aac" || ext == "m4p")
-		return MP4_FILE;
-	if(ext == "mp3"
-		|| ext == "mpg" || ext == "mpga") // these could be mp2, too (TODO?)
-		return MP3_FILE;
-	if(ext == "mp2")
-		return MP2_FILE;
-	if(ext == "mpc" || ext == "mp+" || ext == "mpp")
-		return MPC_FILE;
-	if(ext == "ape" || ext == "mac")
-		return APE_FILE;
-	if(ext == "wv")
-		return WAVPACK_FILE;
-	return MAX_FILE_TYPE;
-}
-
-
 bool read_info(const char *filename, FileInfo *target, MyTag *tags)
 {
-	if((target->ft = filetype_by_ext(filename)) == MAX_FILE_TYPE)
-		return false;
-
 	FileRef f(filename);
 	if(f.isNull())
 		return false;

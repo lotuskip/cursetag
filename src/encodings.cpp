@@ -157,3 +157,15 @@ int num_syms(const string &s)
 	return n;
 }
 
+
+const char* mb_substr(const string &s, int beg, int len)
+{
+	int b = 0;
+	for(; beg > 0; --beg)
+		b += seq_len(s[b]);
+	int e = 0;
+	for(; len > 0; --len)
+		e += seq_len(s[b+e]);
+	return s.substr(b, e).c_str();
+}
+

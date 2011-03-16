@@ -14,4 +14,8 @@ void ins(std::string &s, const unsigned int c, int n); // interpret c as utf-8 a
 // Returns the number of utf-8 symbols (often != s.size())
 int num_syms(const std::string &s);
 
+// Returns a substring, given beginning index and length in utf-8 symbols.
+// Made to return char* because we always pass the result to ncurses to print.
+const char* mb_substr(const std::string &s, int beg, int len);
+
 #endif
