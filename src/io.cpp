@@ -57,6 +57,25 @@ void print_INS(const bool ins)
 	wrefresh(stat_win);
 }
 
+
+// Print as much as possible and add a '>' in different
+// colour if there is more to print.
+void print_amap(const string &s, const int x, const int y, const int boxsize)
+{
+	wmove(tag_win, y, x);
+	if(s.size() > boxsize)
+	{
+		waddstr(tag_win, mb_substr(s, 0, boxsize-1));
+		wattrset(tag_win, COLOR_PAIR(2));
+		waddch(tag_win, '>');
+	}
+	else
+	{
+		waddstr(tag_win, s.c_str());
+		wclrtoeol(tag_win);
+	}
+}
+
 } // end local namespace
 
 
@@ -238,16 +257,10 @@ void redraw_fileinfo(const int idx)
 		wattrset(tag_win, attr);
 		// filename
 		if(idx == -1)
-		{
-			wmove(tag_win, 0, 6); // after "File: "
-			waddstr(tag_win, last_selected->info.filename.c_str());
-		}
+			print_amap(last_selected->info.filename, 6, 0, col/2-6); // 6=len("file: ")
 		else
-		{
-			wmove(tag_win, 3+idx, entry_name[idx].size()-1);
-			waddstr(tag_win, last_selected->tags.strs[idx].c_str());
-		}
-		wclrtoeol(tag_win);
+			print_amap(last_selected->tags.strs[idx], entry_name[idx].size()-1,
+				3+idx, col/2-entry_name[idx].size()+1);
 		wrefresh(tag_win);
 	}
 	else redraw_statics();
@@ -304,11 +317,14 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			wmove(win, basey, basex);
 			wattrset(win, COLOR_PAIR(3)|A_UNDERLINE);
 			waddstr(win, mb_substr(s, printb_pos, min(N - printb_pos, boxsize)));
-			wclrtoeol(win);
-			if(fixbox) // clrtoeol makes an ugly hole into the box!
+			if(N - printb_pos < boxsize)
 			{
-				wattrset(win, COLOR_PAIR(0));
-				box(win, 0, 0);
+				wclrtoeol(win);
+				if(fixbox) // clrtoeol makes an ugly hole into the box!
+				{
+					wattrset(win, COLOR_PAIR(0));
+					box(win, 0, 0);
+				}
 			}
 			redraw = false;
 		}
