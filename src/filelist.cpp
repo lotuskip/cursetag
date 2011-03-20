@@ -1,4 +1,5 @@
 #include "filelist.h"
+#include "encodings.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -36,6 +37,7 @@ string directory;
 vector<FilelistEntry> files;
 vector<FilelistEntry>::iterator under_selector;
 vector<FilelistEntry>::iterator last_selected;
+int longest_fname_len = 0;
 
 bool get_directory(const char* name)
 {
@@ -64,15 +66,23 @@ bool get_directory(const char* name)
 	// make sure the final '/' is there:
 	if(directory[directory.size()-1] != '/')
 		directory += '/';
+	longest_fname_len = num_syms(directory);
 
     struct dirent *dirp;
 	FileInfo tmp_finfo;
 	MyTag tmp_tag;
+	int tmp_i;
 	while((dirp = readdir(dp)) != NULL)
 	{
-		// attempt to read file info; if this fails, the file is of non-supported format, not an audio file or misnamed
+		// Attempt to read file info; if this fails, the file is not of a supported format
+		// or cannot be read.
 		if(read_info((directory+string(dirp->d_name)).c_str(), &tmp_finfo, &tmp_tag))
-				files.push_back(FilelistEntry(string(dirp->d_name), tmp_finfo, tmp_tag));
+		{
+			files.push_back(FilelistEntry(string(dirp->d_name), tmp_finfo, tmp_tag));
+			// Get the longest file name length (in utf-8 symbols):
+			if((tmp_i = num_syms(files.back().name)) > longest_fname_len)
+				longest_fname_len = tmp_i;
+		}
 	}
 	closedir(dp);
 	

@@ -20,6 +20,7 @@ extern std::string directory;
 extern std::vector<FilelistEntry> files;
 extern std::vector<FilelistEntry>::iterator under_selector;
 extern std::vector<FilelistEntry>::iterator last_selected;
+extern int longest_fname_len;
 
 bool get_directory(const char* name);
 

@@ -165,7 +165,11 @@ const char* mb_substr(const string &s, int beg, int len)
 		b += seq_len(s[b]);
 	int e = 0;
 	for(; len > 0; --len)
+	{
+		if(b+e >= s.size())
+			break;
 		e += seq_len(s[b+e]);
+	}
 	return s.substr(b, e).c_str();
 }
 

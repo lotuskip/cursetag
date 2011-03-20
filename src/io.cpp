@@ -5,8 +5,10 @@
 
 using namespace std;
 
-extern bool edit_mode;
+extern bool edit_mode; // defined in inputhandle.cpp
 int row, col;
+
+int fname_print_pos = 0;
 
 namespace
 {
@@ -188,11 +190,31 @@ int get_key()
 
 void redraw_filelist(const bool redraw_everything)
 {
+	bool fixbeg = (fname_print_pos > 0);
+	bool fixend;
+	int syms;
+
 	if(redraw_everything)
 	{
 		wclear(ls_win);
-		wattrset(ls_win, COLOR_PAIR(0));
-		waddstr(ls_win, directory.c_str());
+		if(fixbeg)
+		{
+			wattrset(ls_win, COLOR_PAIR(2));
+			waddch(ls_win, '<');
+		}
+		syms = num_syms(directory);
+		fixend = (syms - fname_print_pos - fixbeg > col/2);
+		if(syms > fname_print_pos)
+		{
+			wattrset(ls_win, COLOR_PAIR(3));
+			waddstr(ls_win, mb_substr(directory, fname_print_pos,
+				col/2 - fixbeg - fixend));
+		}
+		if(fixend)
+		{
+			wattrset(ls_win, COLOR_PAIR(2));
+			waddch(ls_win, '>');
+		}
 	}
 	else
 	{
@@ -208,6 +230,7 @@ void redraw_filelist(const bool redraw_everything)
 			++draw_rng_end;
 		}
 	}
+	// Print actual file entries:
 	wmove(ls_win, 1, 0);
 	int attr, y;
 	if(draw_rng_begin != files.begin())
@@ -221,6 +244,9 @@ void redraw_filelist(const bool redraw_everything)
 	{
 		if(redraw_everything || i->need_redraw)
 		{
+			syms = num_syms(i->name);
+			// The "-1" here comes from the possible '*' indicator
+			fixend = (syms - fname_print_pos - 1 > col/2);
 			attr = COLOR_PAIR(int(i->selected)+1); // PAIR(1) or PAIR(2)
 			if(i == under_selector)
 				attr |= A_STANDOUT;
@@ -228,8 +254,16 @@ void redraw_filelist(const bool redraw_everything)
 			if(i->tags.unsaved_changes)
 				waddch(ls_win, '*');
 			else waddch(ls_win, ' ');
-			waddstr(ls_win, i->name.c_str());
-			waddch(ls_win, '\n');
+			if(syms > fname_print_pos)
+				waddstr(ls_win, mb_substr(i->name, fname_print_pos,
+					col/2 - fixend - 1));
+			if(fixend)
+			{
+				wattrset(ls_win, COLOR_PAIR(2));
+				waddch(ls_win, '>');
+			}
+			else if(syms - fname_print_pos + 1 < col/2)
+				waddch(ls_win, '\n');
 		}
 		else
 		{

@@ -10,6 +10,9 @@ using namespace std;
 
 bool edit_mode = false;
 
+extern int fname_print_pos; // defined in io.cpp
+extern int col;
+
 namespace
 {
 
@@ -37,7 +40,29 @@ void mainloop()
 	for(;;)
 	{
 		k = get_key(); // this is just a getch()
-		if(edit_mode)
+		if(k == 'Q') // quit; in any mode
+		{
+			if(check_unsaved_changes())	
+				return;
+		}
+		else if(k == 'h' || k == KEY_LEFT) // scroll filelist left
+		{
+			if(fname_print_pos > 0)
+			{
+				--fname_print_pos;
+				redraw_filelist(true);
+			}
+		}
+		else if(k == 'l' || k == KEY_RIGHT) // scroll filelist right
+		{
+			if(fname_print_pos < longest_fname_len - col/2)
+			{
+				++fname_print_pos;
+				redraw_filelist(true);
+			}
+		}
+		// Mode-dependent keys:
+		else if(edit_mode)
 		{
 			switch(k)
 			{
@@ -82,8 +107,8 @@ void mainloop()
 						last_selected->tags.strs[idx_to_edit].clear();
 						if(!last_selected->tags.unsaved_changes)
 						{
-								last_selected->tags.unsaved_changes = last_selected->need_redraw = true;
-								redraw_filelist();
+							last_selected->tags.unsaved_changes = last_selected->need_redraw = true;
+							redraw_filelist();
 						}
 						redraw_fileinfo(idx_to_edit);
 					}
@@ -113,17 +138,17 @@ void mainloop()
 				bool changed = false;
 				for(int i = 0; i < MAX_EDITABLES; ++i)
 				{
-						if(!last_selected->tags.strs[i].empty())
-						{
-							last_selected->tags.strs[i].clear();
-							last_selected->tags.unsaved_changes = changed = true;
-						}
+					if(!last_selected->tags.strs[i].empty())
+					{
+						last_selected->tags.strs[i].clear();
+						last_selected->tags.unsaved_changes = changed = true;
+					}
 				}
 				if(changed)
 				{
-						last_selected->need_redraw = true;
-						redraw_filelist();
-						redraw_whole_fileinfo();
+					last_selected->need_redraw = true;
+					redraw_filelist();
+					redraw_whole_fileinfo();
 				}
 				stat_msg("Cleared all.");
 				break;
@@ -131,25 +156,25 @@ void mainloop()
 			case '>': // next file
 				if(last_selected != files.end()-1)
 				{
-						if(!(++last_selected)->selected)
-						{
-							last_selected->selected = last_selected->need_redraw = true;
-							redraw_filelist();
-						}
-						redraw_whole_fileinfo();
-						stat_msg("Next file.");
+					if(!(++last_selected)->selected)
+					{
+						last_selected->selected = last_selected->need_redraw = true;
+						redraw_filelist();
+					}
+					redraw_whole_fileinfo();
+					stat_msg("Next file.");
 				}
 				break;
 			case '<': // prev file
 				if(last_selected != files.begin())
 				{
-						if(!(--last_selected)->selected)
-						{
-							last_selected->selected = last_selected->need_redraw = true;
-							redraw_filelist();
-						}
-						redraw_whole_fileinfo();
-						stat_msg("Previous file.");
+					if(!(--last_selected)->selected)
+					{
+						last_selected->selected = last_selected->need_redraw = true;
+						redraw_filelist();
+					}
+					redraw_whole_fileinfo();
+					stat_msg("Previous file.");
 				}
 				break;
 			default:
@@ -243,12 +268,7 @@ void mainloop()
 				break;
 			case '?':
 				stat_msg((string(PACKAGE_NAME) + " version " + string(PACKAGE_VERSION)
-					+ " (see README or man page for further info)").c_str());
-				break;
-			case 'q': // quit
-				if(check_unsaved_changes())	
-					return;
-				// else
+					+ " (see the man page for further info)").c_str());
 				break;
 			default:
 			{
@@ -258,6 +278,6 @@ void mainloop()
 				break;
 			}
 			}
-		}
-	}
+		} // not edit mode
+	} // for eva
 }
