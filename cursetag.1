@@ -13,7 +13,34 @@ to use the current working directory.
 .PP
 If a valid directory was given, CurseTag will read the files in that directory and list those that are of a recognised audio file type. If there are no recognised audio files in the directory, CurseTag exists.
 .SH USAGE
-.B "The following key commands are available initially:"
+.PP
+.B "Globally available keys (if not editing a string):"
+.TP 8
+A
+select all files
+.TP
+V
+deselect all files (will exit edit mode)
+.TP
+>
+move selector to next file and select it
+.TP
+<
+move selector to previous file and select it
+.TP
+tabulator
+toggle edit mode (see below)
+.TP
+Q
+quit CurseTag; you will be asked for a confirmation if there are unsaved changes
+.TP
+right-arrow, l
+scroll the filelist right (in case the filenames are too long to fit)
+.TP
+left-arrow, h
+scroll the filelist left
+.PP
+.B "Keys in normal mode (outside of edit mode):"
 .TP 13
 up-arrow, k
 move file selector up
@@ -34,10 +61,10 @@ space
 toggle selection of a file
 .TP
 J
-select all files down from selector
+select all files down from selector without moving selector
 .TP
 K
-select all files up from selector
+select all files up from selector without moving selector
 .TP
 i
 enter edit mode (see below)
@@ -52,21 +79,27 @@ W
 write all changes to files
 .TP
 ?
-print version
+print cursetag version
 .PP
 To edit the tags manually, enter the edit mode by pressing 'i'. At least one file has to be
 selected.
 .PP
-.B "In edit mode, the following keys are recognised:"
-.TP 10
+.B "Edit mode keys:"
+.TP 11
 up-arrow, k
-move to previous entry
+move to previous tag entry
 .TP
 down-arrow, j
-move to next entry
+move to next tag entry
+.TP
+g, home
+jump to the beginning of file list and select the first file
+.TP
+G, end
+jump to the end of the file list and select the last file
 .TP
 escape, !
-exit the edit mode
+exit the edit mode (note: can also use tab)
 .TP
 a
 append to current entry
@@ -85,34 +118,12 @@ clear all entries for current file
 .TP
 e
 copy the content of the current entry to the corresponding entries in all selected files
-.TP
-</>
-change view to previous/next file; that file automatically becomes selected
-.PP
-.B "These keys are recognised globally:"
-.TP 5
-Q
-quit CurseTag; you will be asked for a confirmation if there are unsaved changes
-.TP
-right-arrow, l
-scroll the filelist right (in case the filenames are too long to fit)
-.TP
-left-arrow, h
-scroll the filelist left
-.TP
-v
-invert current selection of files
-.TP
-V
-deselect all files
-.PP
-If hitting 'v' or 'V' in edit mode leaves no files selected, you automatically leave edit mode.
 .PP
 .B "Tag/filename interaction"
 .PP
 It is also possible to read the tags automatically from the filenames, or rename the files according to the tags.
 This is accomplished with a control string containing some of the following wildcards:
-.TP 8
+.TP 6
 %t
 track title
 .TP
@@ -123,16 +134,10 @@ artist
 album
 .TP
 %y
-year (date)
+year
 .TP
 %n
 track number
-.TP
-%N
-total number of tracks (if missing, will be filled in automatically according to file count)
-.TP
-%d
-disc number
 .TP
 %c
 comment

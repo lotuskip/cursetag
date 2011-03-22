@@ -141,33 +141,52 @@ void deselect_all()
 	last_selected = files.end();
 }
 
+void select_all()
+{
+	for(vector<FilelistEntry>::iterator i = files.begin(); i != files.end(); ++i)
+	{
+		if(!i->selected)
+			i->selected = i->need_redraw = true;
+	}
+	last_selected = files.end()-1;
+}
+
 bool select_down()
 {
 	vector<FilelistEntry>::iterator i = files.begin();
 	for(; i != under_selector; ++i)
 	{
-			if(i->selected)
-			{
-				i->selected = false;
-				i->need_redraw = true;
-			}
+		if(i->selected)
+		{
+			i->selected = false;
+			i->need_redraw = true;
+		}
 	}
+	// 'i' points to under_selector now
+	bool retval = !i->selected;
+
 	for(; i != files.end(); ++i)
 	{
-			if(!(i->selected))
-				i->selected = i->need_redraw = true;
+		if(!(i->selected))
+			i->selected = i->need_redraw = true;
 	}
 
+	// Note: we don't change the selection any more; we used to:
+#if 0
 	if(last_selected != files.end()-1)
 	{
 		last_selected = files.end()-1;
 		return true;
 	}
-	return false;
+	return false
+#endif
+	return retval;
 }
 
 bool select_up()
 {
+	bool retval = !under_selector->selected;
+
 	vector<FilelistEntry>::iterator i = files.begin();
 	for(; i != under_selector+1; ++i)
 	{
@@ -182,12 +201,15 @@ bool select_up()
 				i->need_redraw = true;
 			}
 	}
+#if 0
 	if(last_selected != files.begin())
 	{
 			last_selected = files.begin();
 			return true;
 	}
 	return false;
+#endif
+	return retval;
 }
 
 void goto_begin()

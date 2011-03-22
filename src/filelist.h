@@ -28,6 +28,7 @@ bool get_directory(const char* name);
 void toggle_select(); // toggle selection of entry under selector
 bool select_or_show(); // set entry selected
 void deselect_all();
+void select_all();
 bool select_down(); // from selector
 bool select_up();
 void goto_begin();

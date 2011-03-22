@@ -40,10 +40,13 @@ void mainloop()
 	for(;;)
 	{
 		k = get_key(); // this is just a getch()
-		if(k == 'Q') // quit; in any mode
+		/*
+		 * Global keys
+		 */
+		if(k == 'Q') // quit
 		{
 			if(check_unsaved_changes())	
-				return;
+				break;
 		}
 		else if(k == 'h' || k == KEY_LEFT) // scroll filelist left
 		{
@@ -61,7 +64,56 @@ void mainloop()
 				redraw_filelist(true);
 			}
 		}
-		// Mode-dependent keys:
+		else if(k == 'A') // select all
+		{
+			select_all();
+			redraw_whole_fileinfo();
+			redraw_filelist();
+			stat_msg("All files selected.");
+		}
+		else if(k == 'V') // deselect all
+		{
+			deselect_all();
+			redraw_whole_fileinfo();
+			redraw_filelist();
+			if(edit_mode)
+			{
+				edit_mode = false;
+				redraw_fileinfo(idx_to_edit);
+				stat_msg("Left edit mode.");
+			}
+			else
+				stat_msg("Selection cleared.");
+		}
+		else if(k == '>') // move to next & select
+		{
+			if(last_selected != files.end()-1)
+			{
+				if(!(++last_selected)->selected)
+				{
+					last_selected->selected = last_selected->need_redraw = true;
+					redraw_filelist();
+				}
+				redraw_whole_fileinfo();
+				stat_msg("Next file.");
+			}
+		}
+		else if(k == '<') // move to prev & select
+		{
+			if(last_selected != files.begin())
+			{
+				if(!(--last_selected)->selected)
+				{
+					last_selected->selected = last_selected->need_redraw = true;
+					redraw_filelist();
+				}
+				redraw_whole_fileinfo();
+				stat_msg("Previous file.");
+			}
+		}
+		/*
+		 * Edit-mode keys
+		 */
 		else if(edit_mode)
 		{
 			switch(k)
@@ -83,9 +135,24 @@ void mainloop()
 				break;
 			case 27: // escape
 			case '!':
+			case '\t':
 				edit_mode = false;
 				redraw_fileinfo(idx_to_edit);
 				stat_msg("Left edit mode.");
+				break;
+			case 'g': case KEY_HOME:
+				goto_begin();
+				if(select_or_show())
+					redraw_whole_fileinfo();
+				redraw_filelist();
+				stat_msg("First file.");
+				break;
+			case 'G': case KEY_END:
+				goto_end();
+				if(select_or_show())
+					redraw_whole_fileinfo();
+				redraw_filelist();
+				stat_msg("Last file.");
 				break;
 			case 'a': // append
 				stat_msg("Append.");
@@ -153,39 +220,18 @@ void mainloop()
 				stat_msg("Cleared all.");
 				break;
 			}
-			case '>': // next file
-				if(last_selected != files.end()-1)
-				{
-					if(!(++last_selected)->selected)
-					{
-						last_selected->selected = last_selected->need_redraw = true;
-						redraw_filelist();
-					}
-					redraw_whole_fileinfo();
-					stat_msg("Next file.");
-				}
-				break;
-			case '<': // prev file
-				if(last_selected != files.begin())
-				{
-					if(!(--last_selected)->selected)
-					{
-						last_selected->selected = last_selected->need_redraw = true;
-						redraw_filelist();
-					}
-					redraw_whole_fileinfo();
-					stat_msg("Previous file.");
-				}
-				break;
 			default:
 			{
-				string tmp = "Unknown key '' in edit mode (esc or \'!\' to leave edit mode)";
+				string tmp = "Unknown key '' in edit mode (esc, tab, or \'!\' to leave edit mode)";
 				ins(tmp, k, 13);
 				stat_msg(tmp.c_str());	
 				break;
 			}
 			}
 		}
+		/*
+		 * Normal mode keys
+		 */
 		else // not edit_mode
 		{
 			switch(k)
@@ -219,16 +265,6 @@ void mainloop()
 					redraw_whole_fileinfo();
 				redraw_filelist();
 				break;
-			case 'V':
-				deselect_all();
-				redraw_whole_fileinfo();
-				redraw_filelist();
-				break;
-			case 'v':
-				invert_selection();
-				redraw_whole_fileinfo();
-				redraw_filelist();
-				break;
 			case 'g': case KEY_HOME:
 				goto_begin();
 				redraw_filelist();
@@ -238,6 +274,7 @@ void mainloop()
 				redraw_filelist();
 				break;
 			case 'i':
+			case '\t':
 				if(last_selected != files.end())
 				{
 					edit_mode = true;
