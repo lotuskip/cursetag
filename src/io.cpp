@@ -89,6 +89,7 @@ void init_curses()
 	keypad(stdscr, TRUE);
 	nodelay(stdscr, FALSE); // we want a blocking getch()
 	noecho();
+	curs_set(0);
 	getmaxyx(stdscr, row, col);
 	check_reso();
 
@@ -322,6 +323,8 @@ void redraw_whole_fileinfo()
 string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 	const int basey, const bool append, const int boxsize, const bool fixbox)
 {
+	curs_set(1);
+
 	// the index in the string *in UTF-8 symbols* (so s[n] makes no sense)
 	int n = 0;
 	// The index at which we start to print onto screen:
@@ -500,6 +503,7 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 	}
 	//DONE!
 	print_INS(false); // remove any "INS"
+	curs_set(0);
 	return s;
 }
 
