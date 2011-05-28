@@ -1,6 +1,6 @@
 # Maintainer: Onni R. <onnir at iki dot fi>
 pkgname=cursetag
-pkgver=2
+pkgver=3
 pkgrel=1
 license=('None')
 pkgdesc="an ncurses based audio metadata (tag) editor"
@@ -8,7 +8,7 @@ arch=('i686' 'x86_64')
 url="http://github.com/lotuskip/cursetag"
 depends=('taglib' 'ncurses')
 source=(http://tempoanon.net/lotuskip/tervat/$pkgname-$pkgver.tar.gz)
-md5sums=('f16c45a15ec654dd974e7855f13dc920')
+md5sums=('16657f414cb4460226906546d681ce04')
 
 build() {
   cd $srcdir/$pkgname

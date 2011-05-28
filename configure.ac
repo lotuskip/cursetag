@@ -1,4 +1,4 @@
-AC_INIT([cursetag], [2])
+AC_INIT([cursetag], [3])
 AM_INIT_AUTOMAKE([foreign -Wall])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])

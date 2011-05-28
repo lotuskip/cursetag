@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <iostream>
+#include <cerrno>
 #include <cstdio>
 
 using namespace std;
@@ -277,9 +278,17 @@ string write_modifieds()
 				if(rename((directory + i->name).c_str(),
 					(directory + i->info.filename).c_str()))
 				{
-					// Maybe check errno and report exact problem (TODO?)
-					return "Could not rename file \'" + i->name + "\' into \'"
-						+ i->info.filename + "\'!";
+					string s = "Could not rename file \'" + i->name + "\' into \'"
+						+ i->info.filename + "\' ";
+					switch(errno)
+					{
+					case EACCES: case EPERM: return s + "(check permissions)";
+					case EROFS: return s + "(read-only)";
+					case ENAMETOOLONG: return s + "(name is too long)";
+					case EEXIST: case ENOTEMPTY: case EINVAL: case EISDIR:
+						return s + "(other name problem)";
+					}
+					return s + "(other problem)";
 				}
 				i->name = i->info.filename;
 			}
