@@ -235,9 +235,9 @@ void move_up()
 {
 	if(under_selector != files.begin())
 	{
-			under_selector->need_redraw = true;
-			--under_selector;
-			under_selector->need_redraw = true;
+		under_selector->need_redraw = true;
+		--under_selector;
+		under_selector->need_redraw = true;
 	}
 }
 
@@ -245,9 +245,9 @@ void move_down()
 {
 	if(under_selector != files.end()-1)
 	{
-			under_selector->need_redraw = true;
-			++under_selector;
-			under_selector->need_redraw = true;
+		under_selector->need_redraw = true;
+		++under_selector;
+		under_selector->need_redraw = true;
 	}
 }
 

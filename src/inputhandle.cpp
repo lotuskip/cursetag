@@ -87,28 +87,20 @@ void mainloop()
 		}
 		else if(k == '>') // move to next & select
 		{
-			if(last_selected != files.end()-1)
+			move_down();
+			if(select_or_show())
 			{
-				if(!(++last_selected)->selected)
-				{
-					last_selected->selected = last_selected->need_redraw = true;
-					redraw_filelist();
-				}
+				redraw_filelist();
 				redraw_whole_fileinfo();
-				stat_msg("Next file.");
 			}
 		}
 		else if(k == '<') // move to prev & select
 		{
-			if(last_selected != files.begin())
+			move_up();
+			if(select_or_show())
 			{
-				if(!(--last_selected)->selected)
-				{
-					last_selected->selected = last_selected->need_redraw = true;
-					redraw_filelist();
-				}
+				redraw_filelist();
 				redraw_whole_fileinfo();
-				stat_msg("Previous file.");
 			}
 		}
 		/*
