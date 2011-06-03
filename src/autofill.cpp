@@ -231,7 +231,7 @@ string get_wild_str(const bool fill)
 	return s;
 }
 
-}
+} // end local namespace
 
 void rename_selected()
 {
@@ -271,7 +271,9 @@ void fill_selected()
 		if(it->selected)
 		{
 			extract_tags_to(&(it->tags), tokens, directory + it->name);
-			// NOTE: we crudely assume that this actually does something:
+			/* NOTE: we crudely assume that this actually does something
+			 * even though it might be that the tags were already consistent
+			 * with the filename vs. the pattern: */
 			it->tags.unsaved_changes = true;
 		}
 	}

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cerrno>
 #include <cstdio>
+#include <cmath>
 
 using namespace std;
 
@@ -27,7 +28,27 @@ void check_empty_selection()
 	last_selected = files.end();
 }
 
+void fix_track_tags()
+{
+	// Because our tag reading reads the tag numbers as integers which are then
+	// converted into strings, there is no proper padding with zeros. We do that
+	// here:
+	short maxtrack = 0, tmp;
+	vector<FilelistEntry>::iterator i;
+	for(i = files.begin(); i != files.end(); ++i)
+	{
+		if((tmp = atoi(i->tags.strs[T_TRACK].c_str())) > maxtrack)
+			maxtrack = tmp;
+	}
+	if((tmp = log10(float(maxtrack))) > 0)
+	{
+		++tmp; // this is how many symbols we want
+		for(i = files.begin(); i != files.end(); ++i)
+			i->tags.strs[T_TRACK].insert(0, max(0,int(tmp-i->tags.strs[T_TRACK].size())), '0');
+	}
 }
+
+} // end local namespace
 
 bool operator<(const FilelistEntry &a, const FilelistEntry &b)
 {
@@ -92,6 +113,8 @@ bool get_directory(const char* name)
 		cerr << "Did not find any recognised audio files in " << name << endl;
 		return false;
 	}
+
+	fix_track_tags();
 
 	sort(files.begin(), files.end());
 	under_selector = files.begin();
