@@ -15,7 +15,7 @@ If a valid directory was given, CurseTag will read the files in that directory a
 .SH USAGE
 .PP
 .B "Globally available keys (if not editing a string):"
-.TP 8
+.TP 10
 A
 select all files
 .TP
@@ -39,9 +39,15 @@ scroll the filelist right (in case the filenames are too long to fit)
 .TP
 left-arrow, h
 scroll the filelist left
+.TP
+J
+select all files down from selector without moving selector
+.TP
+K
+select all files up from selector without moving selector
 .PP
 .B "Keys in normal mode (outside of edit mode):"
-.TP 13
+.TP 11
 up-arrow, k
 move file selector up
 .TP
@@ -59,12 +65,6 @@ select file, or show tag if already selected
 .TP
 space
 toggle selection of a file
-.TP
-J
-select all files down from selector without moving selector
-.TP
-K
-select all files up from selector without moving selector
 .TP
 i
 enter edit mode (see below)

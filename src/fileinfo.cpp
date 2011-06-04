@@ -107,9 +107,9 @@ bool write_info(const char *filename, MyTag *tags)
 	else
 		f.tag()->setYear(atoi(tags->strs[T_YEAR].c_str()));
 	if(tags->strs[T_TRACK].empty())
-		f.tag()->setYear(0); // clear
+		f.tag()->setTrack(0); // clear
 	else
-		f.tag()->setYear(atoi(tags->strs[T_TRACK].c_str()));
+		f.tag()->setTrack(atoi(tags->strs[T_TRACK].c_str()));
 	f.tag()->setComment(tags->strs[T_COMMENT]);
 
 	return f.save();

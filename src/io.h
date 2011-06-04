@@ -10,6 +10,7 @@ void init_curses();
 void deinit_curses();
 bool update_reso(); // called when terminal size is changed
 int get_key();
+void redraw_statics();
 void redraw_filelist(const bool redraw_everything = false);
 void redraw_fileinfo(const int idx);
 void redraw_whole_fileinfo();

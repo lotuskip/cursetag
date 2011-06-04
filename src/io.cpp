@@ -35,23 +35,6 @@ const string entry_name[MAX_EDITABLES] = {
 const char* ins_str[2] = { "   ", "INS" };
 
 
-void redraw_statics()
-{
-	wclear(tag_win);
-	wattrset(tag_win, COLOR_PAIR(0));
-	waddstr(tag_win, "File: ");
-	wclrtoeol(tag_win);
-	wmove(tag_win, 3, 0);
-	for(int i = 0; i < MAX_EDITABLES; ++i)
-	{
-		wattrset(tag_win, COLOR_PAIR(0));
-		waddstr(tag_win, entry_name[i].c_str());
-		wclrtoeol(tag_win);
-	}
-	wrefresh(tag_win);
-}
-
-
 void print_INS(const bool ins)
 {
 	wmove(stat_win, 0, 0);
@@ -107,7 +90,7 @@ void init_curses()
 		COLOR_BLUE, // selected file in filelist
 		COLOR_GREEN }; //modifiable field in file info
 
-		for(int i = 0; i < 4; i++)
+		for(int i = 0; i < 4; ++i)
 			init_pair(i, ct[i], COLOR_BLACK); // background
 	}
 
@@ -183,9 +166,23 @@ bool update_reso()
 }
 
 
-int get_key()
+int get_key() { return getch(); }
+
+
+void redraw_statics()
 {
-	return getch();
+	wclear(tag_win);
+	wattrset(tag_win, COLOR_PAIR(0));
+	waddstr(tag_win, "File: ");
+	wclrtoeol(tag_win);
+	wmove(tag_win, 3, 0);
+	for(int i = 0; i < MAX_EDITABLES; ++i)
+	{
+		wattrset(tag_win, COLOR_PAIR(0));
+		waddstr(tag_win, entry_name[i].c_str());
+		wclrtoeol(tag_win);
+	}
+	wrefresh(tag_win);
 }
 
 
@@ -284,21 +281,24 @@ void redraw_filelist(const bool redraw_everything)
 
 void redraw_fileinfo(const int idx)
 {
-	if(last_selected != files.end())
+	string* thestr = (idx == -1 ? &(last_selected->info.filename)
+		: &(last_selected->tags.strs[idx]));
+	int attr = COLOR_PAIR(3);
+	if(edit_mode && idx == idx_to_edit)
 	{
-		int attr = COLOR_PAIR(3);
-		if(edit_mode && idx == idx_to_edit)
-			attr |= A_STANDOUT;
-		wattrset(tag_win, attr);
-		// filename
-		if(idx == -1)
-			print_amap(last_selected->info.filename, 6, 0, col/2-6); // 6=len("file: ")
+		attr |= A_STANDOUT;
+		if(thestr->empty())
+			curs_set(1);
 		else
-			print_amap(last_selected->tags.strs[idx], entry_name[idx].size()-1,
-				3+idx, col/2-entry_name[idx].size()+1);
-		wrefresh(tag_win);
+			curs_set(0);
 	}
-	else redraw_statics();
+	wattrset(tag_win, attr);
+	// filename
+	if(idx == -1)
+		print_amap(*thestr, 6, 0, col/2-6); // 6=len("file: ")
+	else
+		print_amap(*thestr, entry_name[idx].size()-1, 3+idx, col/2-entry_name[idx].size()+1);
+	wrefresh(tag_win);
 }
 
 
@@ -315,8 +315,11 @@ void redraw_whole_fileinfo()
 		last_selected->info.duration/60, last_selected->info.duration%60);
 	wclrtoeol(tag_win);
 
-	for(int i = -1; i < MAX_EDITABLES; ++i)
-		redraw_fileinfo(i);
+	if(last_selected != files.end())
+	{
+		for(int i = -1; i < MAX_EDITABLES; ++i)
+			redraw_fileinfo(i);
+	}
 }
 
 

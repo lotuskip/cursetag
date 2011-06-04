@@ -103,6 +103,18 @@ void mainloop()
 				redraw_whole_fileinfo();
 			}
 		}
+		else if(k == 'J')
+		{
+			if(select_down())
+				redraw_whole_fileinfo();
+			redraw_filelist();
+		}
+		else if(k == 'K')
+		{
+			if(select_up())
+				redraw_whole_fileinfo();
+			redraw_filelist();
+		}
 		/*
 		 * Edit-mode keys
 		 */
@@ -129,7 +141,7 @@ void mainloop()
 			case '!':
 			case '\t':
 				edit_mode = false;
-				redraw_fileinfo(idx_to_edit);
+				redraw_statics();
 				stat_msg("Left edit mode.");
 				break;
 			case 'g': case KEY_HOME:
@@ -244,16 +256,6 @@ void mainloop()
 				break;
 			case 's':
 				if(select_or_show())
-					redraw_whole_fileinfo();
-				redraw_filelist();
-				break;
-			case 'J':
-				if(select_down())
-					redraw_whole_fileinfo();
-				redraw_filelist();
-				break;
-			case 'K':
-				if(select_up())
 					redraw_whole_fileinfo();
 				redraw_filelist();
 				break;
