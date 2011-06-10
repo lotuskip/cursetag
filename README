@@ -7,10 +7,12 @@ CurseTag is a text-based audio file tag (metadata) editor. It aims to be a
 simplified, lightweight, non-graphical alternative for the quite popular tag
 editor called EasyTag.
 
-In what follows, it will be assumed that the reader is at least somewhat
-familiar with EasyTag. Taking a look at their homepage
-	http:/easytag.sourceforge.net
-should give some idea.
+Advantages of CurseTag over EasyTag:
+	- fully keyboard driven interface
+	- starts up about 10 times faster, if not more
+	- runs in textmode, even without X
+	- much more simple
+For disadvantages, see the "Limitations" section below.
 
 CurseTag supports in principle the file types that TagLib does, which are
 (according to TagLib's homepage; I have not tested all of these with CurseTag!):
@@ -24,17 +26,16 @@ First off, CurseTag is not "EasyTag in text mode". It has significantly less
 features, and this will not change much in the future.
 
 At the moment, CurseTag does not even have any editable configuration. Some
-kind of options will probably be added in the future. Please make suggestions.
+kind of options will probably be added in the future.
 
 CurseTag does not try to be as smart as EasyTag. Some examples:
-(1) If a file has a weird extension, e.g. a vorbis file has extension ".mp3",
-    you might run into some trouble.
-(2) All tags are written in UTF-8 only. Tags that are not UTF-8 might be read
-    wrong or not at all.
-(3) All tag handling is done on the most generic level, so the fine details
-    of different file types are ignored.
-(4) If you have crazy filenames containing escape characters and what not,
-    don't be surprised if something goes wrong.
+	- If a file has a weird extension, e.g. a vorbis file has extension ".mp3",
+      you might run into some trouble.
+	- All tags are written in UTF-8 only.
+	- All tag handling is done on the most generic level, so the fine details
+      of different file types are ignored.
+	- If you have crazy filenames containing escape characters and what not,
+      don't be surprised if something goes wrong.
 
 Compared to EasyTag, CurseTag does much less with regards to reading the tags.
 If the file has non-standard tags or if its tags are in a weird encoding or
@@ -48,13 +49,6 @@ all the tags editable in EasyTag. Embedded pictures are completely ignored.
 Finally, there might be some bugs. Users of EasyTag (or any other tag editor
 they like) might hold on to that piece of software in case CurseTag screws up
 their metadata... Sorry in advance if that happens.
-
-Regarding additional features in the future:
-Mouse support does not sound necessary or even useful. Directory browser seems
-cumbersome and not too beneficial. So does the mere possibility of switching
-the directory without restarting the application. I'd rather keep it simple.
-
-If your desires and opinions differ from mine, feel free to fork or ignore.
 
 
 USAGE

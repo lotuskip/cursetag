@@ -31,7 +31,14 @@ bool check_unsaved_changes()
 	return true;
 }
 
+void leave_editmode()
+{
+	edit_mode = false;
+	redraw_fileinfo(idx_to_edit);
+	stat_msg("Left edit mode.");
 }
+
+} // end local namespace
 
 
 void mainloop()
@@ -77,11 +84,7 @@ void mainloop()
 			redraw_whole_fileinfo();
 			redraw_filelist();
 			if(edit_mode)
-			{
-				edit_mode = false;
-				redraw_fileinfo(idx_to_edit);
-				stat_msg("Left edit mode.");
-			}
+				leave_editmode();
 			else
 				stat_msg("Selection cleared.");
 		}
@@ -140,9 +143,7 @@ void mainloop()
 			case 27: // escape
 			case '!':
 			case '\t':
-				edit_mode = false;
-				redraw_statics();
-				stat_msg("Left edit mode.");
+				leave_editmode();
 				break;
 			case 'g': case KEY_HOME:
 				goto_begin();

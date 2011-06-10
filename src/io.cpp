@@ -12,6 +12,8 @@ int fname_print_pos = 0;
 
 namespace
 {
+const char OUR_ESC_DELAY = 20; //ms
+
 WINDOW *ls_win; // file list
 WINDOW *tag_win; // tags of selected file
 WINDOW *stat_win; // "statusbar"
@@ -68,13 +70,14 @@ void init_curses()
 {
 	// basic stuff
 	initscr();
+	getmaxyx(stdscr, row, col);
+	check_reso(); // might throw!
 	cbreak();
 	keypad(stdscr, TRUE);
 	nodelay(stdscr, FALSE); // we want a blocking getch()
 	noecho();
 	curs_set(0);
-	getmaxyx(stdscr, row, col);
-	check_reso();
+	set_escdelay(OUR_ESC_DELAY);
 
 	// create some windows
 	ls_win = newwin(row-1, col/2, 0, 0);

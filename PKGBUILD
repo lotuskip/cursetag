@@ -7,7 +7,7 @@ pkgdesc="an ncurses based audio metadata (tag) editor"
 arch=('i686' 'x86_64')
 url="http://github.com/lotuskip/cursetag"
 depends=('taglib' 'ncurses')
-source=(http://tempoanon.net/lotuskip/tervat/$pkgname-$pkgver.tar.gz)
+source=(http://github.com/lotuskip/cursetag/raw/master/$pkgname-$pkgver.tar.gz)
 md5sums=('16657f414cb4460226906546d681ce04')
 
 build() {

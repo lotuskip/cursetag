@@ -9,7 +9,8 @@ CurseTag - NCurses based audio file tag editor
 .PP
 If no directory is given, the directory to use is read from stdin, so you can for instance write
 .I "pwd | cursetag"
-to use the current working directory.
+to use the current working directory. ("cursetag ." works, but this will not
+print the actual directory inside the program, which might be confusing.)
 .PP
 If a valid directory was given, CurseTag will read the files in that directory and list those that are of a recognised audio file type. If there are no recognised audio files in the directory, CurseTag exists.
 .SH USAGE
