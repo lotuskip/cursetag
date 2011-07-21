@@ -82,57 +82,109 @@ string filename_for(vector<FilelistEntry>::iterator i, vector<string> tokens)
 }
 
 
+// returns wildcard index or -1 if isn't
+int token_is_wildcard(const string &s)
+{
+	int idx;
+	if(s.size() == 2 && s[0] == '%' && (idx = string(wcard).find(s[1])) != string::npos)
+		return idx;
+	return -1;
+}
+
 void extract_tags_to(MyTag *target, vector<string> tokens, string filepath)
 {
-	// The last token can include the extension or not:
-	size_t i = filepath.rfind('.');
-	// NOTE: may assume i != string::npos since this is the name of a once-accepted file!
-	string s = filepath.substr(i);
-	filepath.erase(i);
-	if((i = tokens.back().rfind(s)) != string::npos)
+	/* Remove from filepath the path that is not referenced in the pattern.
+	 * This is done by simply counting '/'s in the pattern: */
+	size_t i;
+	int idx = 0; // (used here first to count '/'s)
+	vector<string>::iterator tokenit = tokens.begin();
+	while(tokenit != tokens.end())
 	{
-		if(i + s.size() < tokens.back().size()) // there is something *after* the extension; that won't do
-			return; // filename does not match pattern
-		// else the extension is there; get rid of it
-		tokens.back().erase(i);
-		if(i == 0) // removed it completely!
-			tokens.pop_back();
+		i = tokenit->find('/'); // same token might contain several:
+		while(i != string::npos)
+		{
+			++idx;
+			i = (*tokenit).find('/', i+1);
+		}
+		++tokenit;
+	}
+	i = filepath.rfind('/', string::npos);
+	while(idx--)
+	{
+		if(!i)
+			return; // problem with matching (pattern has too many '/'s)
+		i = filepath.rfind('/', i-1);
+	}
+	filepath.erase(0, i+1); // erase unreferenced part of path
+
+	// Match literal tokens in the beginning and end of pattern:
+	if(token_is_wildcard(tokens.front()) == -1)
+	{
+		i = tokens.front().size();
+		if(filepath.substr(0, i) != tokens.front())
+			return; // problem with matching
+		filepath.erase(0, i);
+		tokens.erase(tokens.begin());
+	}
+	if(token_is_wildcard(tokens.back()) == -1)
+	{
+		// back is a literal token
+		i = filepath.size() - tokens.back().size();
+		if(i < 0 || filepath.substr(i) != tokens.back())
+			return; // problem with matching
+		filepath.erase(i);
+		tokens.pop_back();
 	}
 
-	/* After that, we simply match literals to filename (returning if impossible)
-	 * and extract the needed tags in between. Note that this algorithm doesn't
-	 * check the possibility that the same wildcard appears more than once --- the
-	 * value is simply overwritten. */
-	int idx = 0;
+	/* Match front (LHS) tokens as long as the separating literals are not
+	 * spaces, or the wildcards to match are numbers: */
 	while(!tokens.empty())
 	{
-		s = tokens.back(); // save some typing
-		if(s.size() == 2 && s[0] == '%' && (idx = string(wcard).find(s[1])) != string::npos) // is wildcard
+		idx = token_is_wildcard(tokens.front());
+		if(tokens.size() == 1) // that was the last token!
 		{
-			tokens.pop_back();
-			if(tokens.empty()) // that was the last token!
-			{
-				i = filepath.rfind('/');
-				if(i != string::npos)
-					++i;
-				filepath.erase(0, i);
-				target->strs[idx] = filepath;
-			}
-			else // there is a next token
-			{
-				/* NOTE: we take the next token literally even if it is a wildcard!
-				 * Consecutive wildcards, e.g. "%a%A" wouldn't work anyway */
-				if((i = filepath.rfind(tokens.back())) == string::npos)
-					return; // problem with matching
-				target->strs[idx] = filepath.substr(i + tokens.back().size());
-				filepath.erase(i);
-				tokens.pop_back();
-			}
+			target->strs[idx] = filepath;
+			tokens.clear();
 		}
-		else // not wildcard; match literal
+		else if(tokens[1] == " " && idx != T_TRACK && idx != T_YEAR)
+			break; // don't consider this
+		else
 		{
-			if((i = filepath.rfind(tokens.back())) == string::npos)
+			/* NOTE: we take the next token literally even if it is a wildcard!
+			 * Consecutive wildcards, e.g. "%a%A" wouldn't work anyway */
+			if((i = filepath.find(tokens[1])) == string::npos)
 				return; // problem with matching
+			target->strs[idx] = filepath.substr(0, i);
+			filepath.erase(0, i + tokens[1].size());
+			tokens.erase(tokens.erase(tokens.begin()));
+		}
+	}
+
+	/* Match rest from RHS regardless (just taking first matching literal).
+	 * Note that this system has some faults. For instance, if the filenames
+	 * are (for some obscure reason) of the form
+	 *      Album 01 Foo Bar.ogg
+	 * and the user uses a pattern
+	 *      %a %n %t
+	 * to match these, they will find title="Bar", track#="Foo" and
+	 * album="Album 01", which is wrong. */
+	while(!tokens.empty())
+	{
+		idx = token_is_wildcard(tokens.back());
+		tokens.pop_back();
+		if(tokens.empty()) // that was the last token!
+		{
+			i = filepath.rfind('/');
+			if(i != string::npos)
+				++i;
+			filepath.erase(0, i);
+			target->strs[idx] = filepath;
+		}
+		else
+		{
+			if((i = filepath.find(tokens.back())) == string::npos)
+				return; // problem with matching
+			target->strs[idx] = filepath.substr(i + tokens.back().size());
 			filepath.erase(i);
 			tokens.pop_back();
 		}

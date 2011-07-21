@@ -1,5 +1,4 @@
 #include "encodings.h"
-#include <iconv.h>
 #include <iostream>
 #include <cerrno>
 #include <string.h>
@@ -8,21 +7,6 @@ using namespace std;
 
 namespace
 {
-
-// function attempting conversion from a given encoding
-bool try_convert(const char* rawstr, char* output, size_t len, const char* enc)
-{
-	iconv_t ict = iconv_open("UTF-8", enc);
-	if(ict == iconv_t(-1))
-	{
-		cerr << "Conversion from " << enc << " to wchar_t not supported!" << endl;
-		return false;
-	}
-	bool good = (iconv(ict, const_cast<char**>(&rawstr), &len, &output, &len) != size_t(-1));
-	iconv_close(ict);
-	return good;
-}
-
 
 char seq_len(char leadch) // determine the length of the sequence starting with leadch
 {
@@ -59,50 +43,7 @@ void advance(string::iterator &i, string &s)
 		throw utf_error();
 }
 
-
-bool valid_utf8(string &s)
-{
-	string::iterator i = s.begin();
-	try {
-	while(i != s.end())
-		advance(i, s);
-	}
-	catch(utf_error e)
-	{
-		return false;
-	}
-    return true;
-}
-
-}
-
-
-string validate_utf8(const char* rawstr)
-{
-	// It might be, and usually is, that the string IS valid UTF-8, in which case we do nothing to it:
-	string s = string(rawstr);
-	if(valid_utf8(s))
-			return s;
-
-	// Else we try to convert it
-	int len = strlen(rawstr);
-	char* output = new char[len];
-	// try ISO-8859-1? (TODO: try others, such as system default, if not UTF-8?)
-	if(!try_convert(rawstr, output, len, "ISO-8859-1"))
-	{
-		if(errno == EINVAL) // no luck!
-		{
-			// TODO: put to output an escaped string instead?
-			delete[] output; return "";
-		}
-		else { delete[] output; return ""; }
-	}
-	// all good?
-	s = string(output);
-	delete[] output;
-	return s;
-}
-
+} // end local namespace
 
 void del(string &s, int n)
 {
