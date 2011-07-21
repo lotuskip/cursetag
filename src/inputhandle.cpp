@@ -23,9 +23,7 @@ bool check_unsaved_changes()
 		if(i->tags.unsaved_changes)
 		{
 			stat_msg("There are unsaved changes! Enter '!' to confirm quit or anything else to cancel.");
-			if(get_key() == '!')
-				return true;
-			return false;
+			return (get_key() == '!');
 		}
 	}
 	return true;
@@ -73,10 +71,10 @@ void mainloop()
 		}
 		else if(k == 'A') // select all
 		{
+			stat_msg("All files selected.");
 			select_all();
 			redraw_whole_fileinfo();
 			redraw_filelist();
-			stat_msg("All files selected.");
 		}
 		else if(k == 'V') // deselect all
 		{
@@ -90,6 +88,7 @@ void mainloop()
 		}
 		else if(k == '>') // move to next & select
 		{
+			stat_msg("");
 			move_down();
 			if(select_or_show())
 			{
@@ -99,6 +98,7 @@ void mainloop()
 		}
 		else if(k == '<') // move to prev & select
 		{
+			stat_msg("");
 			move_up();
 			if(select_or_show())
 			{
@@ -108,12 +108,14 @@ void mainloop()
 		}
 		else if(k == 'J')
 		{
+			stat_msg("");
 			if(select_down())
 				redraw_whole_fileinfo();
 			redraw_filelist();
 		}
 		else if(k == 'K')
 		{
+			stat_msg("");
 			if(select_up())
 				redraw_whole_fileinfo();
 			redraw_filelist();
@@ -129,6 +131,7 @@ void mainloop()
 			case KEY_UP: case 'k':
 				if(idx_to_edit > -1)
 				{
+					stat_msg("");
 					redraw_fileinfo(idx_to_edit--);
 					redraw_fileinfo(idx_to_edit);
 				}
@@ -136,6 +139,7 @@ void mainloop()
 			case KEY_DOWN: case 'j':
 				if(idx_to_edit < MAX_EDITABLES-1)
 				{
+					stat_msg("");
 					redraw_fileinfo(idx_to_edit++);
 					redraw_fileinfo(idx_to_edit);
 				}
@@ -146,18 +150,18 @@ void mainloop()
 				leave_editmode();
 				break;
 			case 'g': case KEY_HOME:
+				stat_msg("First file.");
 				goto_begin();
 				if(select_or_show())
 					redraw_whole_fileinfo();
 				redraw_filelist();
-				stat_msg("First file.");
 				break;
 			case 'G': case KEY_END:
+				stat_msg("Last file.");
 				goto_end();
 				if(select_or_show())
 					redraw_whole_fileinfo();
 				redraw_filelist();
-				stat_msg("Last file.");
 				break;
 			case 'a': // append
 				stat_msg("Append.");
@@ -174,6 +178,7 @@ void mainloop()
 			case 'c':  // just clear
 				if(idx_to_edit != -1)
 				{
+					stat_msg("Cleared.");
 					if(!last_selected->tags.strs[idx_to_edit].empty())
 					{
 						last_selected->tags.strs[idx_to_edit].clear();
@@ -184,13 +189,13 @@ void mainloop()
 						}
 						redraw_fileinfo(idx_to_edit);
 					}
-					stat_msg("Cleared.");
 				}
 				else stat_msg("Cannot clear filename.");
 				break;
 			case 'e': // apply to all
 				if(idx_to_edit != -1) // cannot have repeated filename!
 				{
+					stat_msg("Applied to all.");
 					for(vector<FilelistEntry>::iterator i = files.begin(); i != files.end(); ++i)
 					{
 						if(i->tags.strs[idx_to_edit] != last_selected->tags.strs[idx_to_edit])
@@ -201,12 +206,12 @@ void mainloop()
 						}
 					}
 					redraw_filelist();
-					stat_msg("Applied to all.");
 				}
 				else stat_msg("Cannot have repeated filename.");
 				break;
 			case 'C': // clear all tags
 			{
+				stat_msg("Cleared all.");
 				bool changed = false;
 				for(int i = 0; i < MAX_EDITABLES; ++i)
 				{
@@ -222,7 +227,6 @@ void mainloop()
 					redraw_filelist();
 					redraw_whole_fileinfo();
 				}
-				stat_msg("Cleared all.");
 				break;
 			}
 			default:
@@ -232,7 +236,7 @@ void mainloop()
 				stat_msg(tmp.c_str());	
 				break;
 			}
-			}
+			} // switch(k)
 		}
 		/*
 		 * Normal mode keys
@@ -243,28 +247,34 @@ void mainloop()
 			{
 			case KEY_RESIZE: case ERR: update_reso(); break; 
 			case KEY_UP: case 'k':
+				stat_msg("");
 				move_up();
 				redraw_filelist();
 				break;
 			case KEY_DOWN: case 'j':
+				stat_msg("");
 				move_down();
 				redraw_filelist();
 				break;
 			case ' ':
+				stat_msg("");
 				toggle_select();
 				redraw_whole_fileinfo();
 				redraw_filelist();
 				break;
 			case 's':
+				stat_msg("");
 				if(select_or_show())
 					redraw_whole_fileinfo();
 				redraw_filelist();
 				break;
 			case 'g': case KEY_HOME:
+				stat_msg("");
 				goto_begin();
 				redraw_filelist();
 				break;
 			case 'G': case KEY_END:
+				stat_msg("");
 				goto_end();
 				redraw_filelist();
 				break;
@@ -272,9 +282,9 @@ void mainloop()
 			case '\t':
 				if(last_selected != files.end())
 				{
+					stat_msg("Edit mode.");
 					edit_mode = true;
 					redraw_fileinfo(idx_to_edit);
-					stat_msg("Edit mode.");
 				}
 				else stat_msg("Select a file first.");
 				break;
