@@ -89,6 +89,11 @@ bool fix_filename(string &s)
 		s[i] = '(';
 	while((i = s.find('>')) != string::npos)
 		s[i] = ')';
+
+	// Make extension lowercase:
+	for(i = s.rfind('.'); i != string::npos && i < s.size(); i++)
+		s[i] = tolower(s[i]);
+
 	return refstr != s;
 }
 
