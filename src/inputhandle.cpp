@@ -237,6 +237,10 @@ void mainloop()
 				break;
 			}
 			} // switch(k)
+
+			// This assures that a cursor is shown for an empty entry:
+			if(edit_mode)
+				redraw_fileinfo(idx_to_edit);
 		}
 		/*
 		 * Normal mode keys
@@ -282,6 +286,11 @@ void mainloop()
 			case '\t':
 				if(last_selected != files.end())
 				{
+					if(last_selected != under_selector)
+					{
+						under_selector = last_selected;
+						redraw_filelist();
+					}
 					stat_msg("Edit mode.");
 					edit_mode = true;
 					redraw_fileinfo(idx_to_edit);
@@ -319,7 +328,7 @@ void mainloop()
 				stat_msg(tmp.c_str());	
 				break;
 			}
-			}
+			} // switch(k)
 		} // not edit mode
 	} // for eva
 }

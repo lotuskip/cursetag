@@ -172,7 +172,7 @@ void select_all()
 		if(!i->selected)
 			i->selected = i->need_redraw = true;
 	}
-	last_selected = files.end()-1;
+	under_selector = last_selected = files.end()-1;
 }
 
 bool select_down()

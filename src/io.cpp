@@ -189,7 +189,7 @@ void redraw_statics()
 }
 
 
-void redraw_filelist(const bool redraw_everything)
+void redraw_filelist(const bool redraw_everything) // def: false
 {
 	bool fixbeg = (fname_print_pos > 0);
 	bool fixend;
@@ -540,12 +540,13 @@ void edit_tag(const int idx, const bool append, const bool clear)
 	vector<string> strs(1); // an array of one element...
 	strs[0] = *s;
 	*s = string_editor(strs, tag_win, basex, basey, append, boxsize);
-	redraw_fileinfo(idx);
+	//redraw_fileinfo(idx);
 	if(idx != -1 && original != *s)
 	{
 		last_selected->need_redraw = last_selected->tags.unsaved_changes = true;
 		redraw_filelist();
 	}
+	stat_msg("");
 }
 
 
