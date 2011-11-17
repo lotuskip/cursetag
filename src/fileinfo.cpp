@@ -6,7 +6,6 @@
 #include <sstream>
 #include <sys/stat.h>
 #include "encodings.h"
-#include "../config.h"
 
 #include <taglib/fileref.h>
 #include <taglib/tag.h>

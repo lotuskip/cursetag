@@ -1,16 +1,11 @@
 .TH cursetag
 .SH NAME
-CurseTag - NCurses based audio file tag editor
+CurseTag - Curses based audio file tag editor
 .SH SYNOPSIS
 .B "cursetag" [DIRECTORY]
 .SH DESCRIPTION
 .PP
 [DIRECTORY] is the directory in which to work. CurseTag only deals with the files in one single directory, and does not touch subdirectories.
-.PP
-If no directory is given, the directory to use is read from stdin, so you can for instance write
-.I "pwd | cursetag"
-to use the current working directory. ("cursetag ." works, but this will not
-print the actual directory inside the program, which might be confusing.)
 .PP
 If a valid directory was given, CurseTag will read the files in that directory and list those that are of a recognised audio file type. If there are no recognised audio files in the directory, CurseTag exists.
 .SH USAGE

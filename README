@@ -1,7 +1,7 @@
 INTRODUCTION
 
 This is a sort of a _explanation_ of CurseTag. For installation instructions,
-see INSTALL file; for usage info, see the man page.
+see Makefile; for usage info, see the man page.
 
 CurseTag is a text-based audio file tag (metadata) editor. It aims to be a
 simplified, lightweight, non-graphical alternative for the quite popular tag
@@ -29,13 +29,13 @@ At the moment, CurseTag does not even have any editable configuration. Some
 kind of options will probably be added in the future.
 
 CurseTag does not try to be as smart as EasyTag. Some examples:
-	- If a file has a weird extension, e.g. a vorbis file has extension ".mp3",
-      you might run into some trouble.
-	- All tags are written in UTF-8 only.
-	- All tag handling is done on the most generic level, so the fine details
-      of different file types are ignored.
-	- If you have crazy filenames containing escape characters and what not,
-      don't be surprised if something goes wrong.
+- If a file has a weird extension, e.g. a vorbis file has extension ".mp3",
+  you might run into some trouble.
+- All tags are written in UTF-8 only.
+- All tag handling is done on the most generic level, so the fine details
+  of different file types are ignored.
+- If you have crazy filenames containing escape characters and what not,
+  don't be surprised if something goes wrong.
 
 Compared to EasyTag, CurseTag does much less with regards to reading the tags.
 If the file has non-standard tags or if its tags are in a weird encoding or

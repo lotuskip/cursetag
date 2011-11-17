@@ -4,27 +4,27 @@
 #include "io.h"
 #include "filelist.h"
 #include "inputhandle.h"
-#include "../config.h"
 
 using namespace std;
 
 
 int main(int argc, char* argv[])
 {
+	if(argc < 2) // if no command line argument, read dir from stdin
+	{
+		cout << "No directory given." << endl;
+		return 1;
+	}
+
 	setlocale(LC_ALL, "");
 	string dirstr;
-	if(argc < 2) // if no command line argument, read dir from stdin
-		cin >> dirstr;
-	else
+	if((dirstr = argv[1]) == "--help" || dirstr == "-h"
+		|| dirstr == "-v" || dirstr == "--version")
 	{
-		if((dirstr = argv[1]) == "--help" || dirstr == "-h"
-			|| dirstr == "-v" || dirstr == "--version")
-		{
-			cout << PACKAGE_STRING << endl <<
-				"Please read the man page or the README file for instructions."
-				<< endl;
-			return 0;
-		}
+		cout << "Cursetag v. " << VERSION << endl <<
+			"Please read the man page or the README file for instructions."
+			<< endl;
+		return 0;
 	}
 	cout << "Reading directory and tags..." << endl;
 	if(!get_directory(dirstr.c_str()))

@@ -4,7 +4,6 @@
 #include "filelist.h"
 #include "autofill.h"
 #include "encodings.h"
-#include "../config.h"
 
 using namespace std;
 
@@ -318,8 +317,7 @@ void mainloop()
 				redraw_filelist();
 				break;
 			case '?':
-				stat_msg((string(PACKAGE_NAME) + " version " + string(PACKAGE_VERSION)
-					+ " (see the man page for further info)").c_str());
+				stat_msg("Cursetag version " VERSION " (see the man page for further info)");
 				break;
 			default:
 			{
