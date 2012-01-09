@@ -296,8 +296,7 @@ void redraw_fileinfo(const int idx)
 			curs_set(0);
 	}
 	wattrset(tag_win, attr);
-	// filename
-	if(idx == -1)
+	if(idx == -1) // filename
 		print_amap(*thestr, 6, 0, col/2-6); // 6=len("file: ")
 	else
 		print_amap(*thestr, entry_name[idx].size()-1, 3+idx, col/2-entry_name[idx].size()+1);
@@ -322,6 +321,13 @@ void redraw_whole_fileinfo()
 	{
 		for(int i = -1; i < MAX_EDITABLES; ++i)
 			redraw_fileinfo(i);
+		// return cursor to proper location (needed in case entry under cursor
+		// is empty)
+		if(idx_to_edit == -1) // filename
+			wmove(tag_win, 0, 6); // 6=len("file: ")
+		else
+			wmove(tag_win, 3+idx_to_edit, entry_name[idx_to_edit].size()-1);
+		wrefresh(tag_win);
 	}
 }
 

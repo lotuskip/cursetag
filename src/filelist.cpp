@@ -126,10 +126,7 @@ bool get_directory(const char* name)
 void toggle_select()
 {
 	if((under_selector->selected = !(under_selector->selected)))
-	{
 		last_selected = under_selector;
-		// move_down(); // Ranger-like selection
-	}
 	else
 		check_empty_selection();
 	under_selector->need_redraw = true;
@@ -139,10 +136,7 @@ void toggle_select()
 bool select_or_show()
 {
 	if(!under_selector->selected)
-	{
 		under_selector->need_redraw = under_selector->selected = true;
-		// move_down(); // Ranger-like selection
-	}
 	if(under_selector != last_selected)
 	{
 		last_selected = under_selector;
