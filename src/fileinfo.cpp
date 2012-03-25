@@ -20,11 +20,11 @@ namespace
 const string replace_with_dash = "/\\:|";
 const string replace_with_unders = "*?\"";
 
-int get_file_size(const char *filename)
+unsigned long get_file_size(const char *filename)
 {
 		struct stat statbuf;
 		if(stat(filename, &statbuf))
-				return -1; // error
+				return 0; // error
 		return statbuf.st_size;
 }
 
@@ -64,7 +64,7 @@ bool read_info(const char *filename, FileInfo *target, MyTag *tags)
 	target->channels = f.audioProperties()->channels();
 	target->duration = f.audioProperties()->length();
 
-	if((target->size = get_file_size(filename)) <= 0) // can't read file anymore or it is empty??
+	if((target->size = get_file_size(filename)) == 0) // can't read file anymore or it is empty??
 		return false;
 	
 	target->filename = filename;

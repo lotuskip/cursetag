@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include "io.h"
 #include "filelist.h"
 #include "encodings.h"
@@ -61,6 +62,30 @@ void print_amap(const string &s, const int x, const int y, const int boxsize)
 		waddstr(tag_win, s.c_str());
 		wclrtoeol(tag_win);
 	}
+}
+
+
+// Functionality to write a filesize prettily:
+const char *sizes[] = { "Tb", "Gb", "Mb", "kb", "b" };
+char printable_size[10]; // might not be enough if file size > 100 Tb
+
+void produce_print_size(const unsigned long size)
+{
+	unsigned long multiplier = 1024UL*1024UL*1024UL*1024UL; // 1 Tb
+
+	for(int i = 0; i < 5; ++i, multiplier /= 1024)
+	{
+		if(size < multiplier)
+			continue;
+		if(!(size % multiplier))
+			snprintf(printable_size, sizeof(printable_size),
+				"%u %s", size/multiplier, sizes[i]);
+		else
+			snprintf(printable_size, sizeof(printable_size),
+				"%.1f %s", float(size)/multiplier, sizes[i]);
+		return;
+	}
+	strcpy(printable_size, "0");
 }
 
 } // end local namespace
@@ -313,7 +338,9 @@ void redraw_whole_fileinfo()
 	wprintw(tag_win, "brate %d kb/s", last_selected->info.bitrate);
 	wprintw(tag_win, "\tsrate %d Hz", last_selected->info.samplerate);
 	wclrtoeol(tag_win);
-	wprintw(tag_win, "\nfsize %d kb\tlen %d:%02d", last_selected->info.size/1024,
+
+	produce_print_size(last_selected->info.size);
+	wprintw(tag_win, "\nfsize %-9s\tlen %d:%02d", printable_size,
 		last_selected->info.duration/60, last_selected->info.duration%60);
 	wclrtoeol(tag_win);
 

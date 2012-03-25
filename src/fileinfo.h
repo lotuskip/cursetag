@@ -10,7 +10,7 @@ struct FileInfo
     int bitrate;               // Bitrate (kb/s); might be average or nominal
     int samplerate;            // Samplerate (Hz)
     int channels;              // # of channels
-    int size;                  // Size of the file (bytes)
+    unsigned long size;        // Size of the file (bytes)
     int duration;              // Duration of the file (seconds)
 };
 
