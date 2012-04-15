@@ -90,7 +90,7 @@ bool fix_filename(string &s)
 		s[i] = ')';
 
 	// Make extension lowercase:
-	for(i = s.rfind('.'); i != string::npos && i < s.size(); i++)
+	for(i = s.rfind('.'); i != string::npos && i < s.size(); ++i)
 		s[i] = tolower(s[i]);
 
 	return refstr != s;

@@ -51,7 +51,7 @@ void print_INS(const bool ins)
 void print_amap(const string &s, const int x, const int y, const int boxsize)
 {
 	wmove(tag_win, y, x);
-	if(s.size() > boxsize)
+	if(num_syms(s) > boxsize)
 	{
 		waddstr(tag_win, mb_substr(s, 0, boxsize-1));
 		wattrset(tag_win, COLOR_PAIR(2));
@@ -324,7 +324,8 @@ void redraw_fileinfo(const int idx)
 	if(idx == -1) // filename
 		print_amap(*thestr, 6, 0, col/2-6); // 6=len("file: ")
 	else
-		print_amap(*thestr, entry_name[idx].size()-1, 3+idx, col/2-entry_name[idx].size()+1);
+		print_amap(*thestr, num_syms(entry_name[idx])-1, 3+idx,
+			col/2-num_syms(entry_name[idx])+1);
 	wrefresh(tag_win);
 }
 
@@ -353,7 +354,7 @@ void redraw_whole_fileinfo()
 		if(idx_to_edit == -1) // filename
 			wmove(tag_win, 0, 6); // 6=len("file: ")
 		else
-			wmove(tag_win, 3+idx_to_edit, entry_name[idx_to_edit].size()-1);
+			wmove(tag_win, 3+idx_to_edit, num_syms(entry_name[idx_to_edit])-1);
 		wrefresh(tag_win);
 	}
 }
@@ -562,7 +563,7 @@ void edit_tag(const int idx, const bool append, const bool clear)
 	else
 	{
 		basey = 3 + idx;
-		basex = entry_name[idx].size()-1;
+		basex = num_syms(entry_name[idx])-1;
 		boxsize = col/2 - basex;
 		s = &(last_selected->tags.strs[idx]);
 	}
