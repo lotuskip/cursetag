@@ -8,7 +8,7 @@ arch=('i686' 'x86_64')
 url="http://github.com/lotuskip/cursetag"
 depends=('taglib' 'ncurses')
 source=(http://github.com/downloads/lotuskip/cursetag/$pkgname-$pkgver.tar.gz)
-md5sums=('bb06232f01a038e54d4b352f68f9fd61')
+md5sums=('33c3931704f97fd8ad95f54dce448eba')
 
 build() {
   cd $srcdir/$pkgname
