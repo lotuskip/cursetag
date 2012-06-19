@@ -79,7 +79,7 @@ void produce_print_size(const unsigned long size)
 			continue;
 		if(!(size % multiplier))
 			snprintf(printable_size, sizeof(printable_size),
-				"%u %s", size/multiplier, sizes[i]);
+				"%lu %s", size/multiplier, sizes[i]);
 		else
 			snprintf(printable_size, sizeof(printable_size),
 				"%.1f %s", float(size)/multiplier, sizes[i]);

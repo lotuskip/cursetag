@@ -8,7 +8,7 @@
 VERSION="\"4\""
 
 CPPFLAGS=-O2 -g0 -fsigned-char -DVERSION=$(VERSION)
-#CPPFLAGS=-O0 -ggdb -fsigned-char -DVERSION=$(VERSION)
+#CPPFLAGS=-O0 -ggdb -fsigned-char -DVERSION=$(VERSION) -Wall -Wextra
 CXX=g++
 RM=rm -f
 LDLIBS=-lncursesw -ltag
