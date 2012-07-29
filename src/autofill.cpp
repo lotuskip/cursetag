@@ -130,7 +130,7 @@ void extract_tags_to(MyTag *target, vector<string> tokens, string filepath)
 	{
 		// back is a literal token
 		i = filepath.size() - tokens.back().size();
-		if(i < 0 || filepath.substr(i) != tokens.back())
+		if(i > filepath.size() || filepath.substr(i) != tokens.back())
 			return; // problem with matching
 		filepath.erase(i);
 		tokens.pop_back();

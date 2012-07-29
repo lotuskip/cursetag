@@ -5,7 +5,7 @@
 # be able to run 'make'. This produces the executable 'cursetag' in the same
 # directory.
 #
-VERSION="\"4\""
+VERSION="\"5\""
 
 CPPFLAGS=-O2 -g0 -fsigned-char -DVERSION=$(VERSION)
 #CPPFLAGS=-O0 -ggdb -fsigned-char -DVERSION=$(VERSION) -Wall -Wextra
