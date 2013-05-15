@@ -1,7 +1,7 @@
 #include "encodings.h"
 #include <iostream>
 #include <cerrno>
-#include <string.h>
+#include <cstring>
 
 using namespace std;
 

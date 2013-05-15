@@ -1,5 +1,3 @@
-#include <ncurses.h>
-#include <vector>
 #include "io.h"
 #include "filelist.h"
 #include "autofill.h"
@@ -197,7 +195,8 @@ void mainloop()
 					stat_msg("Applied to all.");
 					for(vector<FilelistEntry>::iterator i = files.begin(); i != files.end(); ++i)
 					{
-						if(i->tags.strs[idx_to_edit] != last_selected->tags.strs[idx_to_edit])
+						if(i->selected &&
+							i->tags.strs[idx_to_edit] != last_selected->tags.strs[idx_to_edit])
 						{
 							i->tags.strs[idx_to_edit] = last_selected->tags.strs[idx_to_edit];
 							if(!i->tags.unsaved_changes)

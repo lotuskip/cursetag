@@ -1,5 +1,4 @@
 #include <locale.h>
-#include <string>
 #include <iostream>
 #include "io.h"
 #include "filelist.h"

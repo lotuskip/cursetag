@@ -1,6 +1,6 @@
 # Maintainer: Onni R. <onnir at iki dot fi>
 pkgname=cursetag
-pkgver=4
+pkgver=5
 pkgrel=1
 license=('None')
 pkgdesc="an ncurses based audio metadata (tag) editor"
