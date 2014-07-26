@@ -1,3 +1,8 @@
+#ifndef _WIN32
+# include <sys/ioctl.h>
+# include <termios.h>
+#endif
+
 #include <cstdlib>
 #include <cstring>
 #include "io.h"
@@ -146,6 +151,14 @@ void deinit_curses()
 bool update_reso()
 {
 	int oldr = row, oldc = col;
+
+#ifndef _WIN32
+	struct winsize ws;
+
+	ioctl(0, TIOCGWINSZ, &ws);
+	resize_term(ws.ws_row, ws.ws_col);
+#endif
+
 	refresh();
 	getmaxyx(stdscr, row, col);
 
