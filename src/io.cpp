@@ -73,7 +73,7 @@ void produce_print_size(const unsigned long size)
 {
 	unsigned long multiplier = 1024UL*1024UL*1024UL*1024UL; // 1 Tb
 
-	for(int i = 0; i < 5; ++i, multiplier /= 1024)
+	for(int i = 0; multiplier != 0; ++i, multiplier /= 1024)
 	{
 		if(size < multiplier)
 			continue;
