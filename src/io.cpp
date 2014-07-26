@@ -309,6 +309,9 @@ void redraw_filelist(const bool redraw_everything) // def: false
 
 void redraw_fileinfo(const int idx)
 {
+	if(last_selected == files.end())
+		return;
+
 	string* thestr = (idx == -1 ? &(last_selected->info.filename)
 		: &(last_selected->tags.strs[idx]));
 	int attr = COLOR_PAIR(3);
@@ -333,6 +336,9 @@ void redraw_fileinfo(const int idx)
 void redraw_whole_fileinfo()
 {
 	redraw_statics();
+
+	if(last_selected == files.end())
+		return;
 
 	wmove(tag_win, 1, 0);
 	wattrset(tag_win, COLOR_PAIR(0));
