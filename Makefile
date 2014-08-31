@@ -7,8 +7,13 @@
 #
 VERSION="\"5\""
 
-CPPFLAGS=-O2 -g0 -fsigned-char -DVERSION=$(VERSION)
-#CPPFLAGS=-O0 -ggdb -fsigned-char -DVERSION=$(VERSION) -Wall -Wextra
+#Some installations (gentoo) seem to put wide char ncurses separately under
+#"/usr/include/ncursesw/". Put "-DCOMPLICATED_CURSES_HEADER" in CPPFLAGS if
+#this is the case for you.
+
+CPPFLAGS=-O2 -g0 -fsigned-char -DVERSION=$(VERSION) -DCOMPLICATED_CURSES_HEADER
+#CPPFLAGS=-O0 -ggdb -fsigned-char -DVERSION=$(VERSION) -Wall -Wextra -DCOMPLICATED_CURSES_HEADER
+
 CXX=g++
 RM=rm -f
 LDLIBS=-lncursesw -ltag

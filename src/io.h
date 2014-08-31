@@ -2,7 +2,11 @@
 #define IO_H
 #include <string>
 #include <vector>
+#ifdef COMPLICATED_CURSES_HEADER
+#include <ncursesw/ncurses.h>
+#else
 #include <ncurses.h>
+#endif
 
 const int MIN_COLS = 60, MIN_ROWS = 15;
 
