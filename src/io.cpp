@@ -53,7 +53,7 @@ void print_amap(const string &s, const int x, const int y, const int boxsize)
 	wmove(tag_win, y, x);
 	if(num_syms(s) > boxsize)
 	{
-		waddstr(tag_win, mb_substr(s, 0, boxsize-1));
+		waddstr(tag_win, mb_substr(s, 0, boxsize-1).c_str());
 		wattrset(tag_win, COLOR_PAIR(2));
 		waddch(tag_win, '>');
 	}
@@ -73,7 +73,7 @@ void produce_print_size(const unsigned long size)
 {
 	unsigned long multiplier = 1024UL*1024UL*1024UL*1024UL; // 1 Tb
 
-	for(int i = 0; i < 5; ++i, multiplier /= 1024)
+	for(int i = 0; multiplier != 0; ++i, multiplier /= 1024)
 	{
 		if(size < multiplier)
 			continue;
@@ -234,7 +234,7 @@ void redraw_filelist(const bool redraw_everything) // def: false
 		{
 			wattrset(ls_win, COLOR_PAIR(3));
 			waddstr(ls_win, mb_substr(directory, fname_print_pos,
-				col/2 - fixbeg - fixend));
+				col/2 - fixbeg - fixend).c_str());
 		}
 		if(fixend)
 		{
@@ -282,7 +282,7 @@ void redraw_filelist(const bool redraw_everything) // def: false
 			else waddch(ls_win, ' ');
 			if(syms > fname_print_pos)
 				waddstr(ls_win, mb_substr(i->name, fname_print_pos,
-					col/2 - fixend - 1));
+					col/2 - fixend - 1).c_str());
 			if(fixend)
 			{
 				wattrset(ls_win, COLOR_PAIR(2));
@@ -309,6 +309,9 @@ void redraw_filelist(const bool redraw_everything) // def: false
 
 void redraw_fileinfo(const int idx)
 {
+	if(last_selected == files.end())
+		return;
+
 	string* thestr = (idx == -1 ? &(last_selected->info.filename)
 		: &(last_selected->tags.strs[idx]));
 	int attr = COLOR_PAIR(3);
@@ -333,6 +336,9 @@ void redraw_fileinfo(const int idx)
 void redraw_whole_fileinfo()
 {
 	redraw_statics();
+
+	if(last_selected == files.end())
+		return;
 
 	wmove(tag_win, 1, 0);
 	wattrset(tag_win, COLOR_PAIR(0));
@@ -393,7 +399,9 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			print_INS(insert);
 			wmove(win, basey, basex);
 			wattrset(win, COLOR_PAIR(3)|A_UNDERLINE);
-			waddstr(win, mb_substr(s, printb_pos, min(N - printb_pos, boxsize)));
+			const std::string &substr =
+				mb_substr(s, printb_pos, min(N - printb_pos, boxsize));
+			waddstr(win, substr.c_str());
 			if(N - printb_pos < boxsize)
 			{
 				wclrtoeol(win);
@@ -512,9 +520,6 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			{
 				ins(s, key, n);
 				++N; // string got longer
-				++n;
-				if(n >= printb_pos + boxsize)
-					++printb_pos;
 			}
 			else // not insert mode; delete and then insert
 			{
@@ -523,10 +528,9 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 				else // typing at the end of the string
 					++N;
 				ins(s, key, n);
-				++n;
-				if(n >= printb_pos + boxsize)
-					++printb_pos;
 			}
+			if(++n >= printb_pos + boxsize)
+				++printb_pos;
 			redraw = true;
 		}
 		else //i == ERR (? perhaps resize event?)
