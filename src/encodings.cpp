@@ -99,7 +99,7 @@ int num_syms(const string &s)
 }
 
 
-const char* mb_substr(const string &s, int beg, int len)
+std::string mb_substr(const string &s, int beg, int len)
 {
 	int b = 0;
 	for(; beg > 0; --beg)
@@ -111,6 +111,6 @@ const char* mb_substr(const string &s, int beg, int len)
 			break;
 		e += seq_len(s[b+e]);
 	}
-	return s.substr(b, e).c_str();
+	return s.substr(b, e);
 }
 
