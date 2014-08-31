@@ -512,9 +512,6 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 			{
 				ins(s, key, n);
 				++N; // string got longer
-				++n;
-				if(n >= printb_pos + boxsize)
-					++printb_pos;
 			}
 			else // not insert mode; delete and then insert
 			{
@@ -523,10 +520,9 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 				else // typing at the end of the string
 					++N;
 				ins(s, key, n);
-				++n;
-				if(n >= printb_pos + boxsize)
-					++printb_pos;
 			}
+			if(++n >= printb_pos + boxsize)
+				++printb_pos;
 			redraw = true;
 		}
 		else //i == ERR (? perhaps resize event?)
