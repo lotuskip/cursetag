@@ -54,7 +54,7 @@ void print_amap(const string &s, const int x, const int y, const int boxsize)
 	if(num_syms(s) > boxsize)
 	{
 		waddstr(tag_win, mb_substr(s, 0, boxsize-1).c_str());
-		wattrset(tag_win, COLOR_PAIR(2));
+		wattrset(tag_win, COLOR_PAIR(3));
 		waddch(tag_win, '>');
 	}
 	else
@@ -113,12 +113,13 @@ void init_curses()
 	if(has_colors())
 	{
 		start_color();
-		char ct[4] = { COLOR_WHITE, // hard-wired; can't be changed; used for static texts
+		char ct[5] = { COLOR_WHITE, // hard-wired; can't be changed
+		COLOR_WHITE, // used for static texts
 		COLOR_CYAN, // unselected file in file list
 		COLOR_BLUE, // selected file in filelist
 		COLOR_GREEN }; //modifiable field in file info
 
-		for(int i = 0; i < 4; ++i)
+		for(int i = 0; i < 5; ++i)
 			init_pair(i, ct[i], COLOR_BLACK); // background
 	}
 
@@ -200,13 +201,13 @@ int get_key() { return getch(); }
 void redraw_statics()
 {
 	wclear(tag_win);
-	wattrset(tag_win, COLOR_PAIR(0));
+	wattrset(tag_win, COLOR_PAIR(1));
 	waddstr(tag_win, "File: ");
 	wclrtoeol(tag_win);
 	wmove(tag_win, 3, 0);
 	for(int i = 0; i < MAX_EDITABLES; ++i)
 	{
-		wattrset(tag_win, COLOR_PAIR(0));
+		wattrset(tag_win, COLOR_PAIR(1));
 		waddstr(tag_win, entry_name[i].c_str());
 		wclrtoeol(tag_win);
 	}
@@ -225,20 +226,20 @@ void redraw_filelist(const bool redraw_everything) // def: false
 		wclear(ls_win);
 		if(fixbeg)
 		{
-			wattrset(ls_win, COLOR_PAIR(2));
+			wattrset(ls_win, COLOR_PAIR(3));
 			waddch(ls_win, '<');
 		}
 		syms = num_syms(directory);
 		fixend = (syms - fname_print_pos - fixbeg > col/2);
 		if(syms > fname_print_pos)
 		{
-			wattrset(ls_win, COLOR_PAIR(3));
+			wattrset(ls_win, COLOR_PAIR(4));
 			waddstr(ls_win, mb_substr(directory, fname_print_pos,
 				col/2 - fixbeg - fixend).c_str());
 		}
 		if(fixend)
 		{
-			wattrset(ls_win, COLOR_PAIR(2));
+			wattrset(ls_win, COLOR_PAIR(3));
 			waddch(ls_win, '>');
 		}
 	}
@@ -261,7 +262,7 @@ void redraw_filelist(const bool redraw_everything) // def: false
 	int attr, y;
 	if(draw_rng_begin != files.begin())
 	{
-		wattrset(ls_win, COLOR_PAIR(0));
+		wattrset(ls_win, COLOR_PAIR(1));
 		waddstr(ls_win, "[^]\n");
 	}
 	else { wclrtoeol(ls_win); wmove(ls_win, 2, 0); }
@@ -273,7 +274,7 @@ void redraw_filelist(const bool redraw_everything) // def: false
 			syms = num_syms(i->name);
 			// The "-1" here comes from the possible '*' indicator
 			fixend = (syms - fname_print_pos - 1 > col/2);
-			attr = COLOR_PAIR(int(i->selected)+1); // PAIR(1) or PAIR(2)
+			attr = COLOR_PAIR(int(i->selected)+2); // PAIR(2) or PAIR(3)
 			if(i == under_selector)
 				attr |= A_STANDOUT;
 			wattrset(ls_win, attr);
@@ -285,7 +286,7 @@ void redraw_filelist(const bool redraw_everything) // def: false
 					col/2 - fixend - 1).c_str());
 			if(fixend)
 			{
-				wattrset(ls_win, COLOR_PAIR(2));
+				wattrset(ls_win, COLOR_PAIR(3));
 				waddch(ls_win, '>');
 			}
 			else if(syms - fname_print_pos + 1 < col/2)
@@ -299,7 +300,7 @@ void redraw_filelist(const bool redraw_everything) // def: false
 	}
 	if(draw_rng_end != files.end())
 	{
-		wattrset(ls_win, COLOR_PAIR(0));
+		wattrset(ls_win, COLOR_PAIR(1));
 		waddstr(ls_win, "[v]\n");
 	}
 	else wclrtoeol(ls_win);
@@ -314,7 +315,7 @@ void redraw_fileinfo(const int idx)
 
 	string* thestr = (idx == -1 ? &(last_selected->info.filename)
 		: &(last_selected->tags.strs[idx]));
-	int attr = COLOR_PAIR(3);
+	int attr = COLOR_PAIR(4);
 	if(edit_mode && idx == idx_to_edit)
 	{
 		attr |= A_STANDOUT;
@@ -341,7 +342,7 @@ void redraw_whole_fileinfo()
 		return;
 
 	wmove(tag_win, 1, 0);
-	wattrset(tag_win, COLOR_PAIR(0));
+	wattrset(tag_win, COLOR_PAIR(1));
 	wprintw(tag_win, "brate %d kb/s", last_selected->info.bitrate);
 	wprintw(tag_win, "\tsrate %d Hz", last_selected->info.samplerate);
 	wclrtoeol(tag_win);
@@ -398,7 +399,7 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 		{
 			print_INS(insert);
 			wmove(win, basey, basex);
-			wattrset(win, COLOR_PAIR(3)|A_UNDERLINE);
+			wattrset(win, COLOR_PAIR(4)|A_UNDERLINE);
 			const std::string &substr =
 				mb_substr(s, printb_pos, min(N - printb_pos, boxsize));
 			waddstr(win, substr.c_str());
@@ -407,7 +408,7 @@ string string_editor(const vector<string> &strs, WINDOW *win, const int basex,
 				wclrtoeol(win);
 				if(fixbox) // clrtoeol makes an ugly hole into the box!
 				{
-					wattrset(win, COLOR_PAIR(0));
+					wattrset(win, COLOR_PAIR(1));
 					box(win, 0, 0);
 				}
 			}
@@ -591,6 +592,7 @@ void edit_tag(const int idx, const bool append, const bool clear)
 void stat_msg(const char* s)
 {
 	wmove(stat_win, 0, 4);
+	wattrset(stat_win, COLOR_PAIR(1));
 	waddstr(stat_win, s);
 	wclrtoeol(stat_win);
 	wrefresh(stat_win);

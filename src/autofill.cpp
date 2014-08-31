@@ -213,7 +213,7 @@ string get_wild_str(const bool fill)
 	for(;;) // repeat until user is satisfied
 	{
 		wclear(dialog);
-		wattrset(dialog, COLOR_PAIR(0));
+		wattrset(dialog, COLOR_PAIR(1));
 		box(dialog, 0, 0);
 		wmove(dialog, 1, 1);
 		if(fill)
@@ -225,10 +225,10 @@ string get_wild_str(const bool fill)
 		for(k = 0; k < MAX_EDITABLES; ++k)
 		{
 			waddstr(dialog, tag_abbr[k].c_str());
-			wattrset(dialog, COLOR_PAIR(1));
+			wattrset(dialog, COLOR_PAIR(2));
 			waddch(dialog, '%');
 			waddch(dialog, wcard[k]);
-			wattrset(dialog, COLOR_PAIR(0));
+			wattrset(dialog, COLOR_PAIR(1));
 			waddch(dialog, ' ');
 		}
 		wrefresh(dialog);
@@ -241,7 +241,7 @@ string get_wild_str(const bool fill)
 			examples.push_back(s);
 
 		wclear(dialog);
-		wattrset(dialog, COLOR_PAIR(0));
+		wattrset(dialog, COLOR_PAIR(1));
 		box(dialog, 0, 0);
 		wmove(dialog, 1, 1);
 		waddstr(dialog, "Example output: (enter to accept, esc to reformat)");
@@ -258,9 +258,9 @@ string get_wild_str(const bool fill)
 				if(!tags.strs[k].empty())
 				{
 					waddstr(dialog, tag_abbr[k].c_str());
-					wattrset(dialog, COLOR_PAIR(3));
+					wattrset(dialog, COLOR_PAIR(4));
 					waddstr(dialog, tags.strs[k].c_str());
-					wattrset(dialog, COLOR_PAIR(0));
+					wattrset(dialog, COLOR_PAIR(1));
 					waddstr(dialog, " | ");
 				}
 			}
