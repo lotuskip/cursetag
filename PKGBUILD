@@ -5,11 +5,22 @@ pkgrel=1
 license=('None')
 pkgdesc="an ncurses based audio metadata (tag) editor"
 arch=('i686' 'x86_64')
-url="http://github.com/lotuskip/cursetag"
+url="https://github.com/lotuskip/cursetag"
 depends=('taglib' 'ncurses')
-source=(http://github.com/downloads/lotuskip/cursetag/$pkgname-$pkgver.tar.gz)
-md5sums=('33c3931704f97fd8ad95f54dce448eba')
+source=("git+$url")
+md5sums=('SKIP')
 
+pkgver() {
+    cd "$pkgname"
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+  sed -i "s|VERSION=.*$|VERSION=\"\\\\\"${pkgver}\\\\\"\"|" "${srcdir}/${pkgname}/Makefile"
+
+  # sed -i 's|ncursesw/ncurses.h|ncurses.h|' src/io.h
+  sed -i '/[^#]/ s/\(^CPPFLAGS += -DCOMPLICATED_CURSES_HEADER.*$\)/#\1/' "${srcdir}/${pkgname}/Makefile"
+}
 build() {
   cd $srcdir/$pkgname
   make
