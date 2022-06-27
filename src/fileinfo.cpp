@@ -44,6 +44,11 @@ void int_to_str(const int n, string &s)
 	s = ss.str();
 }
 
+TagLib::String as_utf8(const std::string &s)
+{
+	return TagLib::String(s, TagLib::String::UTF8);
+}
+
 } // end local namespace
 
 
@@ -103,9 +108,9 @@ bool write_info(const char *filename, MyTag *tags)
 	if(f.isNull())
 		return false;
 
-	f.tag()->setTitle(tags->strs[T_TITLE]);
-	f.tag()->setArtist(tags->strs[T_ARTIST]);
-	f.tag()->setAlbum(tags->strs[T_ALBUM]);
+	f.tag()->setTitle(as_utf8(tags->strs[T_TITLE]));
+	f.tag()->setArtist(as_utf8(tags->strs[T_ARTIST]));
+	f.tag()->setAlbum(as_utf8(tags->strs[T_ALBUM]));
 	if(tags->strs[T_YEAR].empty())
 		f.tag()->setYear(0); // clear
 	else
@@ -114,7 +119,7 @@ bool write_info(const char *filename, MyTag *tags)
 		f.tag()->setTrack(0); // clear
 	else
 		f.tag()->setTrack(atoi(tags->strs[T_TRACK].c_str()));
-	f.tag()->setComment(tags->strs[T_COMMENT]);
+	f.tag()->setComment(as_utf8(tags->strs[T_COMMENT]));
 
 	return f.save();
 }
