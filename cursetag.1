@@ -1,0 +1,161 @@
+.TH cursetag
+.SH NAME
+CurseTag - Curses based audio file tag editor
+.SH SYNOPSIS
+.B "cursetag" DIRECTORY [-F|-R PATTERN]
+.SH DESCRIPTION
+.PP
+DIRECTORY is the directory in which to work. CurseTag only deals with the files in one single directory, and does not touch subdirectories.
+.PP
+If only a directory is provided, CurseTag runs in interactive mode. Files can be processed in a batch by giving either the -F or -R flag
+followed by a pattern (more details below).
+.PP
+If a valid directory was given, CurseTag will read the files in that directory and list (interactive) or process (batch) them. If there are no recognised audio files in the directory, CurseTag exists.
+.SH INTERACTIVE USAGE
+.PP
+.B "Globally available keys (if not editing a string):"
+.TP 9
+A
+select all files
+.TP
+I
+invert selection (will exit edit mode)
+.TP
+V
+deselect all files (will exit edit mode)
+.TP
+>
+move selector to next file and select it
+.TP
+<
+move selector to previous file and select it
+.TP
+tabulator
+toggle edit mode (see below)
+.TP
+Q
+quit CurseTag; you will be asked for a confirmation if there are unsaved changes
+.TP
+right-arrow, l
+scroll the filelist right (in case the filenames are too long to fit)
+.TP
+left-arrow, h
+scroll the filelist left
+.TP
+J/K
+select all files down/up from selector without moving selector
+.PP
+.B "Keys in normal mode (outside of edit mode):"
+.TP 11
+up-arrow, k
+move file selector up
+.TP
+down-arrow, j
+move file selector down
+.TP
+g, home
+jump to the beginning of the file list
+.TP
+G, end
+jump to the end of the file list
+.TP
+s
+select file, or show tags if already selected
+.TP
+space
+toggle selection of a file
+.TP
+i
+enter edit mode (see below; can also use tab)
+.TP
+F
+fill tags according to file names (see below)
+.TP
+R
+rename files according to tags (see below)
+.TP
+W
+write all changes to files
+.TP
+?
+print cursetag version
+.PP
+To edit the tags manually, enter edit mode by pressing 'i'. At least one file has to be
+selected.
+.PP
+.B "Edit mode keys:"
+.TP 11
+up-arrow, k
+move to previous tag entry
+.TP
+down-arrow, j
+move to next tag entry
+.TP
+g, home
+jump to the beginning of file list and select the first file
+.TP
+G, end
+jump to the end of the file list and select the last file
+.TP
+escape, !
+exit edit mode (note: can also use tab)
+.TP
+a
+append to current entry
+.TP
+i
+insert in the beginning of current entry
+.TP
+c
+clear the current entry
+.TP
+r
+replace the text in current entry (clear, then edit)
+.TP
+C
+clear all entries for current file
+.TP
+e
+copy the content of the current entry to the corresponding entries in all selected files
+.PP
+.B "Tag/filename interaction"
+.PP
+It is also possible to read the tags automatically from the filenames, or rename the files according to the tags.
+This is accomplished with a pattern string containing some of the following wildcards:
+.TP 6
+%t
+track title
+.TP
+%A
+artist
+.TP
+%a
+album
+.TP
+%y
+year
+.TP
+%n
+track number
+.TP
+%c
+comment
+.PP
+Anything besides these wildcards is interpreted literally. For instance, if the working directory is /home/user/music/Band/Albumname/ and the files are named "01. First Track.ogg" etc., the tags can be filled with the string "%A/%a/%n. %t.ogg".
+.PP
+Renaming files is limited to renaming them within the working directory; the directory structure is not touched.
+.SH BATCH MODE
+The batch mode can be used to rename files or fill tags automatically without interaction. The pattern string to use is given as the third and last command line argument. The second argument specifies what to do:
+.TP 9
+-F
+Fill tags according to path&filename.
+.TP
+-R
+Rename files based on tags.
+.PP
+Please be aware that the batch mode asks no questions and simply writes the tags or renames the files. Care should be taken in the invocation, and patterns should always be tested first in the interactive mode.
+.PP
+When renaming files in batch mode, execution will end at first encountered error. CurseTag will not overwrite existing files.
+.SH BUGS
+Bug reports and suggestions; see http://github.com/lotuskip/cursetag
+

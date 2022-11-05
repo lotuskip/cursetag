@@ -1,0 +1,39 @@
+Joyful announcement: Cursetag has been rewritten in C!
+
+- Everything that used to work should still work mostly the same; exceptions:
+	* absolute working path is always shown & used
+	* all characters except '/' are permitted in filenames
+	* only one previously entered fill/rename pattern is stored
+- everything sucks at least a little less
+- lots of little issues have been fixed/improved
+- the executable is less than half the size (same functionality)...
+- you can now rename/fill noninteractively from the command line or a script
+  [->see updated man page]
+- inverse selection is actually implemented! (the code was written in the old
+  version but was never called nor documented...)
+- there's a config.h to change some defaults at compile time
+
+Some technical comments for the more programming oriented:
+
+There is, at least for now, very limited robustness in the code. mallocs are not
+checked. strcpy and strcat are occasionally used, and I am only 90% sure these
+occasions are safe.
+
+Since the code was not written from scratch but literally re-written from the
+C++, some solutions are likely to be suboptimal.
+
+CurseTag mostly does not bother to free what it allocs. This is intentional,
+since it is not a program that keeps running and allocing more and more, but
+mainly allocs what it needs in the beginning.
+
+I am totally frustrated with trying to figure out how to properly react to
+terminal size changes, so now CurseTag just ignores them (NCurses handles them
+internally, tolerably).
+
+Unicode is handled without any extensive or nonextensive libraries, up to 4 byte
+runes (as before). Improper UTF-8 input will cause trouble. Catering anything
+besides UTF-8 in this kind of situation is just an unfortunate practice.
+
+Even though the code is now C, CurseTag still uses TagLib, which is "C++ with
+bindings for C" -- what a joke!
+

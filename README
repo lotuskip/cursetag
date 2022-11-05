@@ -1,0 +1,78 @@
+Note to those familiar with versions < 6:
+Cursetag, which I in my youthful folly wrote in C++, is now written entirely
+in C. For more details on this, see the file CREWRITE. I thought of making
+this a completely new project, which it really *is*, but didn't want to let go
+of the name "CurseTag". So, in terms of "version management", I have chosen to
+make this a new git branch. The old turd of a branch in C++ will not be
+touched by me ever again.
+
+Also in the news, the Swedes have, in the meantime, invented something called
+Spotify. It rids one of the need for "files", as it were. Reportedly, some
+people even use it.
+
+
+INTRODUCTION
+
+This is a sort of a _explanation_ of CurseTag. For compilation/installation
+info, look at the Makefile; for usage info, see the man page.
+
+CurseTag is a text-based audio file tag (metadata) editor. It was originally
+created as a simplified, lightweight, non-graphical alternative for a GUI editor
+called EasyTag.
+
+Advantages of CurseTag over EasyTag:
+	- fully keyboard driven interface
+	- starts up about 10 times faster, if not more
+	- runs in textmode, even without X
+	- much more simple
+	- can rename files & fill tags noninteractively, e.g. from scripts
+For disadvantages, keep reading.
+
+
+LIMITATIONS
+
+The interface is fully keyboard driven.
+
+Simplicity often implies a learning curve.
+
+CurseTag relies on TagLib for reading&writing the tags; therefore any and all
+limitations of TagLib apply. Refer to TagLib documentation for more.
+
+CurseTag does not have any editable configuration. The colours can be configured
+at compile time.
+
+CurseTag does not try to be as smart as EasyTag. Some examples:
+- Filetype detection is left entirely to TagLib. So don't ask me.
+- All tags are read&written in UTF-8 only. Actually, things break if strings are
+  not UTF-8. If you have files with tags in other encodings, I recommend
+  clearing them first thing.
+- All tag handling is done on the most generic level so the fine details of
+  different file types are ignored. Only a basic set of tags is editable at all.
+
+Finally, there might be some bugs. CurseTag might mess up your metadata or even
+cause data loss, especially if used carelessly. Nothing serious has ever
+happened to me, but you have been warned and I take no responsibility.
+
+
+LICENSE
+
+Nobody asked me if I like the Berne Convention; they just keep telling me to
+include a Valid Legal License. Now, this is what I have to say: It is my
+conviction - and I believe the proponents of "freedom of speech" have got my
+back here - that every motherfucker has their own personal Belief System (BS)
+which they [sub]consciously follow, and in the present instance, the BS of the
+aforementioned tellers promotes what some{{who!?}} have named "permission
+culture", which it is your right to look up on Wikipeepee for more
+"information", and which I have previously declared to have everything to do
+with Italian ancenstry, but nobody who happened to see that remark understood
+it! Or at least they failed to let me know! Nevertheless, without causal, or
+casual, connection to the preceding, it is imperative, nay, it is REQUIRED,
+that any asshole who intends to PROFIT by sueing me in a court of "law"
+thoroughly understands this entire paragraph and really this entire file (which,
+of course, someone might have modified in some re-distribution of this piece of
+"software") because I will be referring to various points of it in my
+SUBSTANTIAL defense which will be airtight and GLORIOUSLY baffling and
+SUBSTANTIALLY all-caps and FREE of hateful maliciousness. Irrigardless of all
+that, any cocksucker who wants to use this piece of "software" to manipulate
+the precious audio files they have pirated at some point in time should be
+informed, and thus hopefully is, that nothing in life is certain.
