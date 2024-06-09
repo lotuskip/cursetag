@@ -41,6 +41,7 @@ install: cursetag
 	cp -f cursetag $(DESTDIR)$(PREFIX)/bin
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/cursetag
 	mkdir -p $(DESTDIR)$(MANPREFIX)/man1
+	cp -f cursetag.1 $(DESTDIR)$(MANPREFIX)/man1
 	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/cursetag.1
 
 uninstall:
